@@ -4,6 +4,4 @@ Often, income inequality exists across ethnical groups. Minimum wages have long 
 
 ----
 #### dev log
-* 4 Jun
-
-Find the minumun wage data and income by race from 2010 to 2017 for all states in the US. Next step should be looking for more detailed control data and data cleaning.
+* 4 Jun: Find the minumun wage data and income by race from 2010 to 2017 for all states in the US. Next step should be looking for more detailed control data and data cleaning.

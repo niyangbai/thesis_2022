@@ -1,9 +1,13 @@
+rm(list = ls())
+setwd("D:/github/thesis_2022")
+
+# income by states and race
 library(censusapi)
 Sys.setenv(CENSUS_KEY="4e3f1cfec3b1cf56e92475e26ed86fdccea1fa62")
 
 period <- 2010:2017
 l <- paste0("B19013", LETTERS[1:9])
-fin_tab <- data.frame()
+income_state_race <- data.frame()
 for (year in period) {
   year_tab <- data.frame()
   for (i in l) {
@@ -22,5 +26,9 @@ for (year in period) {
     }
     year_tab$year <- year
   }
-  fin_tab <- rbind(fin_tab, year_tab)
+  income_state_race <- rbind(income_state_race, year_tab)
 }
+
+# min wage
+minwage_state_year <- read.csv("data/minimum_wage.csv")
+minwage_state_year <- subset(minwage_state_year, Year %in% seq(2010, 2017))

@@ -7,7 +7,7 @@ Sys.setenv(CENSUS_KEY="4e3f1cfec3b1cf56e92475e26ed86fdccea1fa62")
 
 period <- 2010:2017
 l <- paste0("B19013", LETTERS[1:9])
-income_state_race <- data.frame()
+income_county_race <- data.frame()
 for (year in period) {
   year_tab <- data.frame()
   for (i in l) {
@@ -26,8 +26,25 @@ for (year in period) {
     }
     year_tab$year <- year
   }
-  income_state_race <- rbind(income_state_race, year_tab)
+  income_county_race <- rbind(income_county_race, year_tab)
 }
+
+# label
+library(Hmisc)
+names(income_county_race)[match(paste0("B19013", LETTERS[1:9], "_001E"), names(income_county_race))] <- paste0("B19013", LETTERS[1:9])
+label(income_county_race$B19013A) <- "White Alone"
+label(income_county_race$B19013B) <- "Black or African American Alone"
+label(income_county_race$B19013C) <- "American Indian and Alaska Native Alone"
+label(income_county_race$B19013D) <- "Asian Alone"
+label(income_county_race$B19013E) <- "Native Hawaiian and Other Pacific Islander Alone"
+label(income_county_race$B19013F) <- "Some Other Race Alone"
+label(income_county_race$B19013G) <- "Two or More Races"
+label(income_county_race$B19013H) <- "White Alone, Not Hispanic or Latino"
+label(income_county_race$B19013I) <- "Hispanic or Latino"
+
+# separate
+library(tidyr)
+income_county_race <- separate(data = income_county_race, col = NAME, into = c("county", "state"), sep = ", ", remove = FALSE)
 
 # min wage
 minwage_state_year <- read.csv("data/minimum_wage.csv")
@@ -35,23 +52,17 @@ minwage_state_year <- subset(minwage_state_year, Year %in% seq(2010, 2017))
 
 # merge
 minwage_state_year$yearstate <- paste(minwage_state_year$year, "-", minwage_state_year$state, sep = "")
-income_state_race$yearstate <- paste(income_state_race$year, "-", income_state_race$NAME, sep = "")
-df <- merge(income_state_race, minwage_state_year, by = "yearstate")
+income_county_race$yearstate <- paste(income_county_race$year, "-", income_county_race$state, sep = "")
+df <- merge(income_county_race, minwage_state_year, by = "yearstate")
 df$year <- df$year.y
-df <- df[,!(names(df) %in% c("yearstate","NAME", "year.x", "year.y"))]
+df$state <- df$state.y
+df <- df[,!(names(df) %in% c("yearstate", "year.x", "year.y", "state.x", "state.y"))]
 
-# label
-library(Hmisc)
-names(df)[match(paste0("B19013", LETTERS[1:9], "_001E"), names(df))] <- paste0("B19013", LETTERS[1:9])
-label(df$B19013A) <- "White Alone"
-label(df$B19013B) <- "Black or African American Alone"
-label(df$B19013C) <- "American Indian and Alaska Native Alone"
-label(df$B19013D) <- "Asian Alone"
-label(df$B19013E) <- "Native Hawaiian and Other Pacific Islander Alone"
-label(df$B19013F) <- "Some Other Race Alone"
-label(df$B19013G) <- "Two or More Races"
-label(df$B19013H) <- "White Alone, Not Hispanic or Latino"
-label(df$B19013I) <- "Hispanic or Latino"
+
+
+
+
+
 
 # real
 df_real <- df
@@ -85,10 +96,3 @@ plot_usmap(data = df_d, values = "dif", color = "black", labels = TRUE) +
   scale_fill_continuous(
     low = "white", high = "red", name = "Minimum Wage (2010)", label = scales::comma
   ) + theme(legend.position = "right")
-
-
-acs_income_group <- getCensus(
-  name = "acs/acs5", 
-  vintage = 2015, 
-  vars = c("NAME", "group(B19013C)"), 
-  region = "county:*")

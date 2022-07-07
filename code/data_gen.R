@@ -16,7 +16,7 @@ for (year in period) {
       name = "acs/acs5", 
       vintage = year,
       vars = c("NAME", g), 
-      region = "state:*")
+      region = "county:*")
     e <- paste(i, "_001E", sep="")
     acs_income_group <- acs_income_group[c("NAME", e)]
     if (nrow(year_tab) == 0) {
@@ -86,3 +86,9 @@ plot_usmap(data = df_d, values = "dif", color = "black", labels = TRUE) +
     low = "white", high = "red", name = "Minimum Wage (2010)", label = scales::comma
   ) + theme(legend.position = "right")
 
+
+acs_income_group <- getCensus(
+  name = "acs/acs5", 
+  vintage = 2015, 
+  vars = c("NAME", "group(B19013C)"), 
+  region = "county:*")

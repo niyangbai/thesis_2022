@@ -48,7 +48,7 @@ income_county_race <- separate(data = income_county_race, col = NAME, into = c("
 
 # min wage
 minwage_state_year <- read.csv("data/minimum_wage.csv")
-minwage_state_year <- subset(minwage_state_year, Year %in% seq(2010, 2017))
+minwage_state_year <- subset(minwage_state_year, year %in% seq(2010, 2017))
 
 # merge
 minwage_state_year$yearstate <- paste(minwage_state_year$year, "-", minwage_state_year$state, sep = "")
@@ -58,20 +58,17 @@ df$year <- df$year.y
 df$state <- df$state.y
 df <- df[,!(names(df) %in% c("yearstate", "year.x", "year.y", "state.x", "state.y"))]
 
+# subset 2010 & 2017
 
 
-
-
-
-
-# real
-df_real <- df
-df_real$coef <- df_real$Federal.Minimum.Wage.2020.Dollars/df_real$Federal.Minimum.Wage
-for (i in paste0("B19013", LETTERS[1:9])) {
-  df_real[i] <- df_real[i] * df_real$coef
-}
-names(df_real)[match(paste0("B19013", LETTERS[1:9]), names(df_real))] <- paste0("B19013", LETTERS[1:9], ".2020.Dollars")
-df_real = df_real[,!(names(df_real) %in% c("State.Minimum.Wage", "Federal.Minimum.Wage", "coef"))]
+# # real
+# df_real <- df
+# df_real$coef <- df_real$Federal.Minimum.Wage.2020.Dollars/df_real$Federal.Minimum.Wage
+# for (i in paste0("B19013", LETTERS[1:9])) {
+#   df_real[i] <- df_real[i] * df_real$coef
+# }
+# names(df_real)[match(paste0("B19013", LETTERS[1:9]), names(df_real))] <- paste0("B19013", LETTERS[1:9], ".2020.Dollars")
+# df_real = df_real[,!(names(df_real) %in% c("State.Minimum.Wage", "Federal.Minimum.Wage", "coef"))]
 
 # # min wage difference
 # df_10 <- subset(df, year == 2010)

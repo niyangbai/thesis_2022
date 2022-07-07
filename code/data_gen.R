@@ -40,11 +40,33 @@ df <- merge(income_state_race, minwage_state_year, by = "yearstate")
 df$year <- df$year.y
 df <- df[,!(names(df) %in% c("yearstate","NAME", "year.x", "year.y"))]
 
-# min wage difference
-df_10 <- subset(df, year == 2010)
-df_d <- subset(df, year == 2017)[c("state", "State.Minimum.Wage")]
-df_d$dif <- df_d$State.Minimum.Wage - df_10$State.Minimum.Wage
-df_d <- df_d[,!(names(df_d) == "State.Minimum.Wage")]
+# label
+library(Hmisc)
+names(df)[match(paste0("B19013", LETTERS[1:9], "_001E"), names(df))] <- paste0("B19013", LETTERS[1:9])
+label(df$B19013A) <- "White Alone"
+label(df$B19013B) <- "Black or African American Alone"
+label(df$B19013C) <- "American Indian and Alaska Native Alone"
+label(df$B19013D) <- "Asian Alone"
+label(df$B19013E) <- "Native Hawaiian and Other Pacific Islander Alone"
+label(df$B19013F) <- "Some Other Race Alone"
+label(df$B19013G) <- "Two or More Races"
+label(df$B19013H) <- "White Alone, Not Hispanic or Latino"
+label(df$B19013I) <- "Hispanic or Latino"
+
+# real
+df_real <- df
+df_real$coef <- df_real$Federal.Minimum.Wage.2020.Dollars/df_real$Federal.Minimum.Wage
+for (i in paste0("B19013", LETTERS[1:9])) {
+  df_real[i] <- df_real[i] * df_real$coef
+}
+names(df_real)[match(paste0("B19013", LETTERS[1:9]), names(df_real))] <- paste0("B19013", LETTERS[1:9], ".2020.Dollars")
+df_real = df_real[,!(names(df_real) %in% c("State.Minimum.Wage", "Federal.Minimum.Wage", "coef"))]
+
+# # min wage difference
+# df_10 <- subset(df, year == 2010)
+# df_d <- subset(df, year == 2017)[c("state", "State.Minimum.Wage")]
+# df_d$dif <- df_d$State.Minimum.Wage - df_10$State.Minimum.Wage
+# df_d <- df_d[,!(names(df_d) == "State.Minimum.Wage")]
 
 # min wage plot
 library(usmap)

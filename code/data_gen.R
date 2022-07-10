@@ -49,6 +49,13 @@ income_county_race <- separate(data = income_county_race, col = NAME, into = c("
 # min wage
 minwage_state_year <- read.csv("data/minimum_wage.csv")
 minwage_state_year <- subset(minwage_state_year, year %in% seq(2010, 2017))
+minwage_state_year <- subset(minwage_state_year, select = c("year", "state", "State.Minimum.Wage"))
+minwage_state_year_2010 <- subset(minwage_state_year, year == 2010)
+names(minwage_state_year_2010)[names(minwage_state_year_2010) == "State.Minimum.Wage"] <- "2010.State.Minimum.Wage"
+minwage_state_year_2017 <- subset(minwage_state_year, year == 2017)
+names(minwage_state_year_2017)[names(minwage_state_year_2017) == "State.Minimum.Wage"] <- "2017.State.Minimum.Wage"
+minwage_state_year_dif <- merge(minwage_state_year_2010, minwage_state_year_2017, by = "state")
+minwage_state_year_dif$dif <- minwage_state_year_dif$`2017.State.Minimum.Wage` - minwage_state_year_dif$`2010.State.Minimum.Wage`
 
 # merge
 minwage_state_year$yearstate <- paste(minwage_state_year$year, "-", minwage_state_year$state, sep = "")
@@ -62,6 +69,7 @@ df <- df[,!(names(df) %in% c("yearstate", "year.x", "year.y", "state.x", "state.
 df_clean <- df
 df_clean[df_clean == -666666666] <- NA
 df_clean <- na.omit(df_clean)
+
 
 # # real
 # df_real <- df

@@ -13,9 +13,9 @@ for (year in period) {
   for (i in l) {
     g <- paste("group(", i, ")", sep="")
     acs_income_group <- getCensus(
-      name = "acs/acs5", 
+      name = "acs/acs5",
       vintage = year,
-      vars = c("NAME", g), 
+      vars = c("NAME", g),
       region = "county:*")
     e <- paste(i, "_001E", sep="")
     acs_income_group <- acs_income_group[c("NAME", e)]
@@ -58,8 +58,10 @@ df$year <- df$year.y
 df$state <- df$state.y
 df <- df[,!(names(df) %in% c("yearstate", "year.x", "year.y", "state.x", "state.y"))]
 
-# subset 2010 & 2017
-
+# subset
+df_clean <- df
+df_clean[df_clean == -666666666] <- NA
+df_clean <- na.omit(df_clean)
 
 # # real
 # df_real <- df
@@ -79,17 +81,17 @@ df <- df[,!(names(df) %in% c("yearstate", "year.x", "year.y", "state.x", "state.
 # min wage plot
 library(usmap)
 library(ggplot2)
-plot_usmap(data = df[which(df$year=='2017'),], values = "State.Minimum.Wage", color = "black") + 
+plot_usmap(data = df[which(df$year=='2017'),], values = "State.Minimum.Wage", color = "black") +
   scale_fill_continuous(
     low = "white", high = "blue", name = "Minimum Wage (2017)", label = scales::comma
   ) + theme(legend.position = "right")
 
-plot_usmap(data = df[which(df$year=='2010'),], values = "State.Minimum.Wage", color = "black") + 
+plot_usmap(data = df[which(df$year=='2010'),], values = "State.Minimum.Wage", color = "black") +
   scale_fill_continuous(
     low = "white", high = "red", name = "Minimum Wage (2010)", label = scales::comma
   ) + theme(legend.position = "right")
 
-plot_usmap(data = df_d, values = "dif", color = "black", labels = TRUE) + 
+plot_usmap(data = df_d, values = "dif", color = "black", labels = TRUE) +
   scale_fill_continuous(
     low = "white", high = "red", name = "Minimum Wage (2010)", label = scales::comma
   ) + theme(legend.position = "right")

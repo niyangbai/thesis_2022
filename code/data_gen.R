@@ -70,7 +70,6 @@ df_clean <- df
 df_clean[df_clean == -666666666] <- NA
 df_clean <- na.omit(df_clean)
 
-
 # # real
 # df_real <- df
 # df_real$coef <- df_real$Federal.Minimum.Wage.2020.Dollars/df_real$Federal.Minimum.Wage

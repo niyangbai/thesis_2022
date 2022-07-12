@@ -55,7 +55,7 @@ names(minwage_state_year_2010)[names(minwage_state_year_2010) == "State.Minimum.
 minwage_state_year_2017 <- subset(minwage_state_year, year == 2017)
 names(minwage_state_year_2017)[names(minwage_state_year_2017) == "State.Minimum.Wage"] <- "2017.State.Minimum.Wage"
 minwage_state_year_dif <- merge(minwage_state_year_2010, minwage_state_year_2017, by = "state")
-minwage_state_year_dif$dif <- minwage_state_year_dif$`2017.State.Minimum.Wage` - minwage_state_year_dif$`2010.State.Minimum.Wage`
+minwage_state_year_dif$dif <- round(minwage_state_year_dif$`2017.State.Minimum.Wage` - minwage_state_year_dif$`2010.State.Minimum.Wage`, 2)
 
 # merge
 minwage_state_year$yearstate <- paste(minwage_state_year$year, "-", minwage_state_year$state, sep = "")
@@ -99,7 +99,7 @@ plot_usmap(data = df[which(df$year=='2010'),], values = "State.Minimum.Wage", co
     low = "white", high = "red", name = "Minimum Wage (2010)", label = scales::comma
   ) + theme(legend.position = "right")
 
-plot_usmap(data = df_d, values = "dif", color = "black", labels = TRUE) +
+plot_usmap(data = minwage_state_year_dif, values = "dif", color = "black", labels = TRUE) +
   scale_fill_continuous(
     low = "white", high = "red", name = "Minimum Wage (2010)", label = scales::comma
   ) + theme(legend.position = "right")

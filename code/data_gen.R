@@ -55,7 +55,9 @@ names(minwage_state_year_2010)[names(minwage_state_year_2010) == "State.Minimum.
 minwage_state_year_2017 <- subset(minwage_state_year, year == 2017)
 names(minwage_state_year_2017)[names(minwage_state_year_2017) == "State.Minimum.Wage"] <- "2017.State.Minimum.Wage"
 minwage_state_year_dif <- merge(minwage_state_year_2010, minwage_state_year_2017, by = "state")
+minwage_state_year_dif <- minwage_state_year_dif[,!(names(minwage_state_year_dif) %in% c("year.x", "year.y"))]
 minwage_state_year_dif$dif <- round(minwage_state_year_dif$`2017.State.Minimum.Wage` - minwage_state_year_dif$`2010.State.Minimum.Wage`, 2)
+minwage_state_year_dif$treated <- !minwage_state_year_dif$dif == 0
 
 # merge
 minwage_state_year$yearstate <- paste(minwage_state_year$year, "-", minwage_state_year$state, sep = "")
@@ -69,6 +71,9 @@ df <- df[,!(names(df) %in% c("yearstate", "year.x", "year.y", "state.x", "state.
 df_clean <- df
 df_clean[df_clean == -666666666] <- NA
 df_clean <- na.omit(df_clean)
+
+df_10_17 <- df_clean[which(df_clean$year %in% c(2010, 2017)),]
+df_10_17$after <- df_10_17$year == 2017
 
 # # real
 # df_real <- df

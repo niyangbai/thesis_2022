@@ -1,5 +1,6 @@
 rm(list = ls())
 setwd("D:/github/thesis_2022")
+library(thesis2022)
 
 #read data
 income_county_race <- read.csv("data/income_county_race.csv")
@@ -33,22 +34,26 @@ minwage_state_year_dif <- merge(minwage_state_year_2010, minwage_state_year_2017
 minwage_state_year_dif <- minwage_state_year_dif[,!(names(minwage_state_year_dif) %in% c("year.x", "year.y"))]
 minwage_state_year_dif$dif <- round(minwage_state_year_dif$`2017.State.Minimum.Wage` - minwage_state_year_dif$`2010.State.Minimum.Wage`, 2)
 minwage_state_year_dif$treated <- !minwage_state_year_dif$dif == 0
-
-# merge
-minwage_state_year$yearstate <- paste(minwage_state_year$year, "-", minwage_state_year$state, sep = "")
-income_county_race$yearstate <- paste(income_county_race$year, "-", income_county_race$state, sep = "")
-df <- merge(income_county_race, minwage_state_year, by = "yearstate")
-df$year <- df$year.y
-df$state <- df$state.y
-df <- df[,!(names(df) %in% c("yearstate", "year.x", "year.y", "state.x", "state.y"))]
+minwage_state_year_dif <- onehotencoding(minwage_state_year_dif, "dif")
 
 # subset
-df_clean <- df
-df_clean[df_clean == -666666666] <- NA
-df_clean <- na.omit(df_clean)
+clean_income_county_race <- income_county_race
+clean_income_county_race[clean_income_county_race == -666666666] <- NA
+clean_income_county_race <- na.omit(clean_income_county_race)
 
-df_10_17 <- df_clean[which(df_clean$year %in% c(2010, 2017)),]
-df_10_17$after <- df_10_17$year == 2017
+clean_10_17 <- clean_income_county_race[which(clean_income_county_race$year %in% c(2010, 2017)),]
+clean_10_17$after <- clean_10_17$year == 2017
+label(clean_10_17$after) <- "after treatment"
+
+
+
+# # merge
+# df <- merge(clean_10_17, minwage_state_year_dif, by = "state")
+# df$year <- df$year.y
+# df$state <- df$state.y
+# df <- df[,!(names(df) %in% c("yearstate", "year.x", "year.y", "state.x", "state.y"))]
+#
+
 
 # # real
 # df_real <- df

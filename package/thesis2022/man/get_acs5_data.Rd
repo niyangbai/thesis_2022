@@ -7,10 +7,6 @@
 get_acs5_data(period, table, subtable)
 }
 \arguments{
-\item{period}{}
-
-\item{table}{}
-
 \item{subtable}{}
 }
 \value{

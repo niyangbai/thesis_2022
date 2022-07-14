@@ -1,8 +1,8 @@
 #' get_acs5_data
 #'
-#' @param period 
-#' @param table 
-#' @param subtable 
+#' @param period
+#' @param table
+#' @param subtable
 #'
 #' @return
 #' @export
@@ -12,7 +12,7 @@ get_acs5_data <- function(period, table, subtable) {
   df <- data.frame()
   for (year in period) {
     year_tab <- data.frame()
-    for (i in l) {
+    for (i in table) {
       g <- paste("group(", i, ")", sep="")
       subdf <- getCensus(
         name = "acs/acs5",

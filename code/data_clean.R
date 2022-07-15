@@ -73,6 +73,11 @@ df <- df[,!(names(df) %in% c("2017.State.Minimum.Wage", "2010.State.Minimum.Wage
 # write csv
 write.csv(df, "D:/github/thesis_2022/data/main_data.csv", row.names = FALSE)
 
+# bachelor
+bachelor_county_race <- read.csv("data/bachelor_county_race.csv")
+names(bachelor_county_race)[match(paste0("B19301", LETTERS[1:9], "_001E"), names(bachelor_county_race))] <- paste0("B19301", LETTERS[1:9])
+bachelor_county_race <- bachelor_county_race[,!(names(bachelor_county_race) %in% c("B19301C", "B19301E", "B19301F", "B19301G", "B19301H", "B19301I"))]
+
 # # real
 # df_real <- df
 # df_real$coef <- df_real$Federal.Minimum.Wage.2020.Dollars/df_real$Federal.Minimum.Wage

@@ -35,8 +35,8 @@ wage_gap$B_W <- income_county_race$B19013B.x/income_county_race$B19013A.x
 label(wage_gap$B_W) <- "Black and White wage gap"
 wage_gap$A_W <- income_county_race$B19013D.x/income_county_race$B19013A.x
 label(wage_gap$A_W) <- "Asian and White wage gap"
-wage_gap$aft <- wage_gap$year == 2017
-label(wage_gap$aft) <- "After treatment"
+wage_gap$time <- wage_gap$year == 2017
+label(wage_gap$time) <- "After treatment"
 
 # separate
 library(tidyr)
@@ -70,6 +70,9 @@ for (i in 1:nrow(df)) {
 }
 df <- df[,!(names(df) %in% c("2017.State.Minimum.Wage", "2010.State.Minimum.Wage", "dif"))]
 
+# write csv
+write.csv(df, "D:/github/thesis_2022/data/main_data.csv", row.names = FALSE)
+
 # # real
 # df_real <- df
 # df_real$coef <- df_real$Federal.Minimum.Wage.2020.Dollars/df_real$Federal.Minimum.Wage
@@ -84,21 +87,3 @@ df <- df[,!(names(df) %in% c("2017.State.Minimum.Wage", "2010.State.Minimum.Wage
 # df_d <- subset(df, year == 2017)[c("state", "State.Minimum.Wage")]
 # df_d$dif <- df_d$State.Minimum.Wage - df_10$State.Minimum.Wage
 # df_d <- df_d[,!(names(df_d) == "State.Minimum.Wage")]
-
-# min wage plot
-library(usmap)
-library(ggplot2)
-plot_usmap(data = df[which(df$year=='2017'),], values = "State.Minimum.Wage", color = "black") +
-  scale_fill_continuous(
-    low = "white", high = "blue", name = "Minimum Wage (2017)", label = scales::comma
-  ) + theme(legend.position = "right")
-
-plot_usmap(data = df[which(df$year=='2010'),], values = "State.Minimum.Wage", color = "black") +
-  scale_fill_continuous(
-    low = "white", high = "red", name = "Minimum Wage (2010)", label = scales::comma
-  ) + theme(legend.position = "right")
-
-plot_usmap(data = minwage_state_year_dif, values = "dif", color = "black", labels = TRUE) +
-  scale_fill_continuous(
-    low = "white", high = "red", name = "Minimum Wage (2010)", label = scales::comma
-  ) + theme(legend.position = "right")

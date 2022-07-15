@@ -18,9 +18,29 @@ label(income_county_race$B19013G) <- "Two or More Races"
 label(income_county_race$B19013H) <- "White Alone, Not Hispanic or Latino"
 label(income_county_race$B19013I) <- "Hispanic or Latino"
 
+# subset
+income_county_race <- income_county_race[,!(names(income_county_race) %in% c("B19013C", "B19013E", "B19013F", "B19013G", "B19013H", "B19013I"))]
+income_10 <- income_county_race[which(income_county_race$year == 2010),]
+income_17 <- income_county_race[which(income_county_race$year == 2017),]
+income_county_race <- merge(income_10, income_17, by = "NAME")
+income_county_race[income_county_race == -666666666] <- NA
+income_county_race <- na.omit(income_county_race)
+income_10 <- income_county_race[c("NAME", "year.x", "B19013A.x", "B19013B.x", "B19013D.x")]
+income_17 <- income_county_race[c("NAME", "year.y", "B19013A.y", "B19013B.y", "B19013D.y")]
+colnames(income_17) <- colnames(income_10)
+income_county_race <- rbind(income_10, income_17)
+wage_gap <- income_county_race["NAME"]
+wage_gap$year <- income_county_race$year.x
+wage_gap$B_W <- income_county_race$B19013B.x/income_county_race$B19013A.x
+label(wage_gap$B_W) <- "Black and White wage gap"
+wage_gap$A_W <- income_county_race$B19013D.x/income_county_race$B19013A.x
+label(wage_gap$A_W) <- "Asian and White wage gap"
+wage_gap$aft <- wage_gap$year == 2017
+label(wage_gap$aft) <- "After treatment"
+
 # separate
 library(tidyr)
-income_county_race <- separate(data = income_county_race, col = NAME, into = c("county", "state"), sep = ", ", remove = FALSE)
+wage_gap <- separate(data = wage_gap, col = NAME, into = c("county", "state"), sep = ", ", remove = FALSE)
 
 # min wage
 minwage_state_year <- read.csv("data/minimum_wage.csv")
@@ -30,30 +50,25 @@ minwage_state_year_2010 <- subset(minwage_state_year, year == 2010)
 names(minwage_state_year_2010)[names(minwage_state_year_2010) == "State.Minimum.Wage"] <- "2010.State.Minimum.Wage"
 minwage_state_year_2017 <- subset(minwage_state_year, year == 2017)
 names(minwage_state_year_2017)[names(minwage_state_year_2017) == "State.Minimum.Wage"] <- "2017.State.Minimum.Wage"
-minwage_state_year_dif <- merge(minwage_state_year_2010, minwage_state_year_2017, by = "state")
-minwage_state_year_dif <- minwage_state_year_dif[,!(names(minwage_state_year_dif) %in% c("year.x", "year.y"))]
-minwage_state_year_dif$dif <- round(minwage_state_year_dif$`2017.State.Minimum.Wage` - minwage_state_year_dif$`2010.State.Minimum.Wage`, 2)
-minwage_state_year_dif$treated <- !minwage_state_year_dif$dif == 0
-minwage_state_year_dif <- onehotencoding(minwage_state_year_dif, "dif")
+minwage_state_year <- merge(minwage_state_year_2010, minwage_state_year_2017, by = "state")
+minwage_state_year <- minwage_state_year[,!(names(minwage_state_year) %in% c("year.x", "year.y"))]
+minwage_state_year$dif <- round(minwage_state_year$`2017.State.Minimum.Wage` - minwage_state_year$`2010.State.Minimum.Wage`, 2)
+minwage_state_year$trt <- !(minwage_state_year$dif == 0)
+label(minwage_state_year$trt) <- "Treatment group"
+# minwage_state_year <- onehotencoding(minwage_state_year, "dif")
 
-# subset
-clean_income_county_race <- income_county_race
-clean_income_county_race[clean_income_county_race == -666666666] <- NA
-clean_income_county_race <- na.omit(clean_income_county_race)
-
-clean_10_17 <- clean_income_county_race[which(clean_income_county_race$year %in% c(2010, 2017)),]
-clean_10_17$after <- clean_10_17$year == 2017
-label(clean_10_17$after) <- "after treatment"
-
-
-
-# # merge
-# df <- merge(clean_10_17, minwage_state_year_dif, by = "state")
-# df$year <- df$year.y
-# df$state <- df$state.y
-# df <- df[,!(names(df) %in% c("yearstate", "year.x", "year.y", "state.x", "state.y"))]
-#
-
+# merge
+df <- merge(wage_gap, minwage_state_year, by = "state")
+df$min_wage <- NA
+label(df$min_wage) <- "State Minimum Wage"
+for (i in 1:nrow(df)) {
+  if (df$year[i] == 2017) {
+    df$min_wage[i] <- df$`2017.State.Minimum.Wage`[i]
+  } else {
+    df$min_wage[i] <- df$`2010.State.Minimum.Wage`[i]
+  }
+}
+df <- df[,!(names(df) %in% c("2017.State.Minimum.Wage", "2010.State.Minimum.Wage", "dif"))]
 
 # # real
 # df_real <- df

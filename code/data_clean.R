@@ -87,6 +87,11 @@ for (i in 1:nrow(df)) {
 }
 df <- df[,!(names(df) %in% c("2017.State.Minimum.Wage", "2010.State.Minimum.Wage", "dif"))]
 
+# gdp
+gdp_county <- read.csv("data/gdp_county.csv")
+gdp_county <- separate(data = gdp_county, col = GeoName, into = c("county", "state"), sep = ", ", remove = TRUE)
+gdp_county$state <- lapply(gdp_county$state, thesis2022::abbr2name)
+
 # write csv
 write.csv(df, "D:/github/thesis_2022/data/main_data.csv", row.names = FALSE)
 

@@ -28,4 +28,5 @@ library(bea.R)
 beaKey <-"780D17CC-7441-4E52-93BF-2B3D89DBDF74"
 
 # gdp
-gdp <- thesis2022::get_bea_data(beaKey, "CAGDP2", 1, period)
+gdp_county <- thesis2022::get_bea_data(beaKey, "CAGDP2", 1, period)
+write.csv(gdp_county, "D:/github/thesis_2022/data/gdp_county.csv", row.names = FALSE)

@@ -25,3 +25,7 @@ write.csv(bachelor_county_race, "D:/github/thesis_2022/data/bachelor_county_race
 
 # bea
 library(bea.R)
+beaKey <-"780D17CC-7441-4E52-93BF-2B3D89DBDF74"
+
+# gdp
+gdp <- thesis2022::get_bea_data(beaKey, "CAGDP2", 1, period)

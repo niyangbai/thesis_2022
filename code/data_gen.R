@@ -4,7 +4,6 @@ library(thesis2022)
 library(censusapi)
 library(bea.R)
 
-# acs5
 # https://www.socialexplorer.com/data/ACS2015/metadata/?ds=ACS15
 
 Sys.setenv(CENSUS_KEY="4e3f1cfec3b1cf56e92475e26ed86fdccea1fa62")

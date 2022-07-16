@@ -31,16 +31,17 @@ colnames(income_17) <- colnames(income_10)
 income_county_race <- rbind(income_10, income_17)
 wage_gap <- income_county_race["NAME"]
 wage_gap$year <- income_county_race$year.x
-wage_gap$B_W <- income_county_race$B19013B.x/income_county_race$B19013A.x
-label(wage_gap$B_W) <- "Black and White wage gap"
-wage_gap$A_W <- income_county_race$B19013D.x/income_county_race$B19013A.x
-label(wage_gap$A_W) <- "Asian and White wage gap"
+wage_gap$wage_gap_B_W <- income_county_race$B19013B.x/income_county_race$B19013A.x
+label(wage_gap$wage_gap_B_W) <- "Black and White wage gap"
+wage_gap$wage_gap_A_W <- income_county_race$B19013D.x/income_county_race$B19013A.x
+label(wage_gap$wage_gap_A_W) <- "Asian and White wage gap"
 wage_gap$time <- wage_gap$year == 2017
 label(wage_gap$time) <- "After treatment"
 
 # separate
 library(tidyr)
 wage_gap <- separate(data = wage_gap, col = NAME, into = c("county", "state"), sep = ", ", remove = FALSE)
+wage_gap$NAME <- paste(wage_gap$year, "-", wage_gap$NAME, sep = "")
 
 # min wage
 minwage_state_year <- read.csv("data/minimum_wage.csv")
@@ -57,8 +58,24 @@ minwage_state_year$trt <- !(minwage_state_year$dif == 0)
 label(minwage_state_year$trt) <- "Treatment group"
 # minwage_state_year <- onehotencoding(minwage_state_year, "dif")
 
+# bachelor
+bachelor_county_race <- read.csv("data/bachelor_county_race.csv")
+names(bachelor_county_race)[match(paste0("B19301", LETTERS[1:9], "_001E"), names(bachelor_county_race))] <- paste0("B19301", LETTERS[1:9])
+bachelor_county_race <- bachelor_county_race[,!(names(bachelor_county_race) %in% c("B19301C", "B19301E", "B19301F", "B19301G", "B19301H", "B19301I"))]
+bachelor_county_race[bachelor_county_race == -666666666] <- NA
+bachelor_county_race <- na.omit(bachelor_county_race)
+edu <- bachelor_county_race["year"]
+edu$NAME <- paste(bachelor_county_race$year, "-", bachelor_county_race$NAME, sep = "")
+edu$edu_B_W <- bachelor_county_race$B19301B / bachelor_county_race$B19301A
+label(edu$edu_B_W) <- "Black and white education gap"
+edu$edu_A_W <- bachelor_county_race$B19301D / bachelor_county_race$B19301A
+label(edu$edu_A_W) <- "Asian and white education gap"
+
 # merge
 df <- merge(wage_gap, minwage_state_year, by = "state")
+df <- merge(df, edu, by = "NAME")
+df$year <- df$year.x
+df <- df[,!(names(df) %in% c("year.x", "year.y"))]
 df$min_wage <- NA
 label(df$min_wage) <- "State Minimum Wage"
 for (i in 1:nrow(df)) {
@@ -73,10 +90,6 @@ df <- df[,!(names(df) %in% c("2017.State.Minimum.Wage", "2010.State.Minimum.Wage
 # write csv
 write.csv(df, "D:/github/thesis_2022/data/main_data.csv", row.names = FALSE)
 
-# bachelor
-bachelor_county_race <- read.csv("data/bachelor_county_race.csv")
-names(bachelor_county_race)[match(paste0("B19301", LETTERS[1:9], "_001E"), names(bachelor_county_race))] <- paste0("B19301", LETTERS[1:9])
-bachelor_county_race <- bachelor_county_race[,!(names(bachelor_county_race) %in% c("B19301C", "B19301E", "B19301F", "B19301G", "B19301H", "B19301I"))]
 
 # # real
 # df_real <- df

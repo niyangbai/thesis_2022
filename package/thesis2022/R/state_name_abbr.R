@@ -1,6 +1,6 @@
 #' abbr to full name
 #'
-#' @param abbr 
+#' @param abbr
 #'
 #' @return
 #' @export
@@ -14,7 +14,7 @@ abbr2name <- function(abbr) {
 
 #' full name to abbr
 #'
-#' @param name 
+#' @param name
 #'
 #' @return
 #' @export
@@ -24,4 +24,20 @@ name2abbr <- function(name) {
   i <- which(state.name == name)
   abbr <- state.abb[i]
   return(abbr)
+}
+
+"fips_code"
+#' fips code to name
+#'
+#' @param fips
+#'
+#' @return
+#' @export
+#'
+#' @examples
+fips2name <- function(fips) {
+  names <- paste0(fips_code$county_name, ", ", fips_code$state_name)
+  i <- which(fips_code$fips == fips)
+  name <- names[i]
+  return(name)
 }

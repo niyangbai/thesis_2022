@@ -1,6 +1,7 @@
 # min wage plot
 library(usmap)
 library(ggplot2)
+
 plot_usmap(data = df[which(df$year=='2017'),], values = "State.Minimum.Wage", color = "black") +
   scale_fill_continuous(
     low = "white", high = "blue", name = "Minimum Wage (2017)", label = scales::comma

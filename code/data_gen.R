@@ -35,5 +35,3 @@ save(bachelor_county_race,
      per_capita_income_county_race,
      unemp_county,
      file = "D:/github/thesis_2022/data/raw_data.RData")
-
-

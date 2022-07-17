@@ -5,6 +5,7 @@ library(thesis2022)
 # read data
 load("data/cleaned_data.RData")
 
-# reg black white 10 17
-didreg_B_W <- lm(wage_gap_B_W ~ edu_B_W + gdp + uer + trt*time, data = df)
+# reg black white
+didreg_B_W <- lm(wage_gap_B_W ~ trt*time + uer_B + pop_B + gdp_per_capita + density, data = df)
 summary(didreg_B_W)
+

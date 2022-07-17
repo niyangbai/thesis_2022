@@ -18,27 +18,34 @@ period <- 2010:2017
 median_household_income <- paste0("B19013", LETTERS[c(1, 2, 4)], "_001E")
 per_capita_income <- paste0("B19301", LETTERS[c(1, 2, 4)], "_001E")
 bachelor <- paste0("C15010", LETTERS[c(1, 2, 4)], "_001E")
-pop <- c("DP05_0037E", "DP05_0038E", "DP05_0044E")
+race_pop_share <- c("DP05_0037PE", "DP05_0038PE", "DP05_0044PE")
+total_pop <- c("DP05_0001E")
+race_unemp <- c("S2301_C04_012E", "S2301_C04_013E", "S2301_C04_015E")
 
 econ_table_name <- "acs/acs5"
 pop_table_name <- "acs/acs5/profile"
+emp_table_name <- "acs/acs5/subject"
 
-cagdp <- "CAGDP11"
+real_gdp <- "CAGDP9"
 line_code_gdp <- 1
 urls <- paste0("https://www.bls.gov/lau/laucnty", period - 2000, ".xlsx")
 
-median_household_income_county_race <- thesis2022::get_acs5_data(econ_table_name, period, median_household_income)
-per_capita_income_county_race <- thesis2022::get_acs5_data(econ_table_name, period, per_capita_income)
-bachelor_county_race <- thesis2022::get_acs5_data(econ_table_name, period, per_capita_income)
-pop_county_race <- thesis2022::get_acs5_data(pop_table_name, period, pop)
-gdp_county <- thesis2022::get_bea_data(beaKey, cagdp, line_code_gdp, period)
-unemp_county <- get_unemp_from_bls(urls)
+median_household_income_county_race <- get_acs5_data(econ_table_name, period, median_household_income)
+per_capita_income_county_race <- get_acs5_data(econ_table_name, period, per_capita_income)
+bachelor_county_race <- get_acs5_data(econ_table_name, period, per_capita_income)
+race_pop_share_county <- get_acs5_data(pop_table_name, period, race_pop_share)
+race_unemp_county <- get_acs5_data(emp_table_name, period, race_unemp)
+total_pop_county <- get_acs5_data(pop_table_name, period, total_pop)
+real_gdp_county <- get_bea_data(beaKey, real_gdp, line_code_gdp, period)
+total_unemp_county <- get_unemp_from_bls(urls)
 
 # save data
 save(bachelor_county_race,
-     gdp_county,
+     real_gdp_county,
      median_household_income_county_race,
-     pop_county_race,
+     race_pop_share_county,
+     total_pop_county,
      per_capita_income_county_race,
-     unemp_county,
+     total_unemp_county,
+     race_unemp_county,
      file = "D:/github/thesis_2022/data/raw_data.RData")

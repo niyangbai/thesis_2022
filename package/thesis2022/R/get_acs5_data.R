@@ -1,34 +1,28 @@
-#' get_acs5_data
+#' get acs5 data
 #'
+#' @param table_name
 #' @param period
-#' @param table
-#' @param subtable
+#' @param data_code
 #'
 #' @return
 #' @export
 #'
 #' @examples
-get_acs5_data <- function(period, table, subtable) {
+get_acs5_data <- function(table_name, period, data_code) {
   df <- data.frame()
   for (year in period) {
-    year_tab <- data.frame()
-    for (i in table) {
-      g <- paste("group(", i, ")", sep="")
-      subdf <- getCensus(
-        name = "acs/acs5",
-        vintage = year,
-        vars = c("NAME", g),
-        region = "county:*")
-      e <- paste(i, "_", subtable, sep="")
-      subdf <- subdf[c("NAME", e)]
-      if (nrow(year_tab) == 0) {
-        year_tab <- subdf
-      } else {
-        year_tab <- merge(year_tab, subdf, by="NAME")
-      }
-      year_tab$year <- year
+    data <- getCensus(
+      name = table_name,
+      vintage = year,
+      vars = data_code,
+      region = "county:*")
+    data$year <- year
+    if (nrow(df) == 0) {
+      df <- data
+    } else {
+      df <- rbind(df, data)
     }
-    df <- rbind(df, year_tab)
   }
+  df$fips <- paste0(df$state, df$county)
   return(df)
 }

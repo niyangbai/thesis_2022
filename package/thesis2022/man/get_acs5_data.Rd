@@ -2,16 +2,16 @@
 % Please edit documentation in R/get_acs5_data.R
 \name{get_acs5_data}
 \alias{get_acs5_data}
-\title{get_acs5_data}
+\title{get acs5 data}
 \usage{
-get_acs5_data(period, table, subtable)
+get_acs5_data(table_name, period, data_code)
 }
 \arguments{
-\item{subtable}{}
+\item{data_code}{}
 }
 \value{
 
 }
 \description{
-get_acs5_data
+get acs5 data
 }

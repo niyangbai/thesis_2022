@@ -75,7 +75,7 @@ gdp_county <- subset(gdp_county, TimePeriod %in% c(2010, 2017))
 gdp_county$NAME <- lapply(gdp_county$GeoFips, fips2name)
 gdp_county[gdp_county == "character(0)"] <- NA
 gdp_county$gdp <- gdp_county$DataValue
-label(gdp_county$gdp) <- "GDP in current dollars"
+label(gdp_county$gdp) <- "GDP change"
 gdp_county <- gdp_county[,c("TimePeriod", "NAME", "gdp")]
 gdp_county <- na.omit(gdp_county)
 gdp_county$NAME <- paste0(gdp_county$TimePeriod, "-", gdp_county$NAME)

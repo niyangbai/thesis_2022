@@ -50,15 +50,16 @@ minwage_state_year <- minwage_state_year[,!(names(minwage_state_year) %in% c("ye
 minwage_state_year$dif <- round(minwage_state_year$`after.State.Minimum.Wage` - minwage_state_year$`before.State.Minimum.Wage`, 2)
 minwage_state_year$trt <- !(minwage_state_year$dif == 0)
 minwage_state_year$fuzzy_trt <- minwage_state_year$dif / max(minwage_state_year$dif)
-minwage_state_year <- onehotencoding(minwage_state_year, "dif")
+# minwage_state_year <- onehotencoding(minwage_state_year, "dif")
 
-# bachelor
-names(bachelor_county_race)[match(paste0("B19301", LETTERS[c(1 ,2, 4)], "_001E"), names(bachelor_county_race))] <- paste0("B19301", LETTERS[c(1 ,2, 4)])
-bachelor_county_race[bachelor_county_race == -666666666] <- NA
-edu_county <- bachelor_county_race["year"]
-edu_county$ID <- paste0(bachelor_county_race$year, bachelor_county_race$fips)
-edu_county$edu_B_W <- abs(bachelor_county_race$B19301B / bachelor_county_race$B19301A - 1)
-edu_county$edu_A_W <- abs(bachelor_county_race$B19301D / bachelor_county_race$B19301A - 1)
+# education
+names(highschool_county_race)[match(paste0("C15002", LETTERS[c(1 ,2, 4)], "_004E"), names(highschool_county_race))] <- paste0("C15002", LETTERS[c(1 ,2, 4)])
+highschool_county_race[highschool_county_race == -666666666] <- NA
+edu_county <- highschool_county_race["year"]
+edu_county$ID <- paste0(highschool_county_race$year, highschool_county_race$fips)
+edu_county$edu_B <- highschool_county_race$C15002B
+edu_county$edu_A <- highschool_county_race$C15002D
+edu_county$edu_W <- highschool_county_race$C15002A
 
 # gdp
 real_gdp_county <- subset(real_gdp_county, TimePeriod %in% c(before, after))
@@ -81,17 +82,13 @@ race_uer$uer_B <- race_unemp_county$S2301_C04_013E
 race_uer$uer_A <- race_unemp_county$S2301_C04_015E
 race_uer[race_uer == -666666666] <- NA
 
-# Total population
-total_pop_county$ID <- paste0(total_pop_county$year, total_pop_county$fips)
-total_pop_county$total_pop <- total_pop_county$DP05_0001E
-total_pop_county <- total_pop_county[c("ID", "total_pop")]
-
-# Ethical population share
-race_pop_share_county$ID <- paste0(race_pop_share_county$year, race_pop_share_county$fips)
-race_share <- race_pop_share_county["ID"]
-race_share$pop_W <- race_pop_share_county$DP05_0037PE
-race_share$pop_B <- race_pop_share_county$DP05_0038PE
-race_share$pop_A <- race_pop_share_county$DP05_0044PE
+# Ethical population
+race_pop_county$ID <- paste0(race_pop_county$year, race_pop_county$fips)
+race_pop <- race_pop_county["ID"]
+race_pop$pop_W <- race_pop_county$DP05_0037E
+race_pop$pop_B <- race_pop_county$DP05_0038E
+race_pop$pop_A <- race_pop_county$DP05_0044E
+race_pop$pop_T <- race_pop_county$DP05_0001E
 
 # merge
 df <- merge(wage_gap, minwage_state_year, by = "state")
@@ -99,7 +96,7 @@ df <- merge(df, edu_county, by = "ID")
 df <- merge(df, real_gdp_county, by = "ID")
 df <- merge(df, total_unemp_county, by = "ID")
 df <- merge(df, total_pop_county, by = "ID")
-df <- merge(df, race_share, by = "ID")
+df <- merge(df, race_pop, by = "ID")
 df <- merge(df, race_uer, by = "ID")
 df <- merge(df, age, by = "ID")
 df$year <- df$year.x
@@ -116,28 +113,39 @@ df <- df[,!(names(df) %in% c("after.State.Minimum.Wage", "before.State.Minimum.W
 
 # calculation
 # gdp per capita
-df$gdp_per_capita <- df$gdp / df$total_pop
+df$gdp_per_capita <- df$gdp / df$pop_T
 
 # density
 df$area <- as.numeric(sapply(df$state, state2area))
-df$density <- df$total_pop / df$area
+df$density <- df$pop_T / df$area
+
+# pop share
+df$share_W <- df$pop_W / df$pop_T
+df$share_B <- df$pop_B / df$pop_T
+df$share_A <- df$pop_A / df$pop_T
+
+# high school rate
+df$edur_A <- df$edu_A / df$pop_A
+df$edur_B <- df$edu_B / df$pop_B
+df$edur_W <- df$edu_W / df$pop_W
 
 # label
 label(df$wage_gap_B_W) <- "Black and White wage gap"
 label(df$wage_gap_A_W) <- "Asian and White wage gap"
 label(df$time) <- "After treatment"
-label(df$edu_B_W) <- "Black and white edu_countycation gap"
-label(df$edu_A_W) <- "Asian and white edu_countycation gap"
+label(df$edu_B) <- "High School (Black)"
+label(df$edu_A) <- "High School (Asian)"
+label(df$edu_W) <- "High School (White)"
 label(df$gdp) <- "Total Real GDP (2012)"
 label(df$uer) <- "Total unemployment rate"
 label(df$min_wage) <- "State Minimum Wage"
 label(df$trt) <- "Treatment group"
-label(df$total_pop) <- "Total Population"
+label(df$fuzzy_trt) <- "Fuzzy Treatment"
+label(df$pop_T) <- "Total Population"
 label(df$gdp_per_capita) <- "GDP per Capita (2012)"
-label(df$pop_W) <- "White Population Share"
-label(df$pop_B) <- "Black Population Share"
-label(df$pop_A) <- "Asian Population Share"
-label(df$pop_A) <- "Asian Population Share"
+label(df$pop_W) <- "White Population"
+label(df$pop_B) <- "Black Population"
+label(df$pop_A) <- "Asian Population"
 label(df$area) <- "State Area (sq mi)"
 label(df$density) <- "Population Density"
 label(df$uer_W) <- "Unemployment rate (White)"
@@ -146,6 +154,12 @@ label(df$uer_A) <- "Unemployment rate (Asian)"
 label(df$age_W) <- "Median Age (White)"
 label(df$age_B) <- "Median Age (Black)"
 label(df$age_A) <- "Median Age (Asian)"
+label(df$share_W) <- "White Share"
+label(df$share_B) <- "Black Share"
+label(df$share_A) <- "Asian Share"
+label(df$edur_A) <- "Asian High School Rate"
+label(df$edur_B) <- "Black High School Rate"
+label(df$edur_W) <- "White High School Rate"
 
 # write csv
 save(df, file = "D:/github/thesis_2022/data/cleaned_data.RData")

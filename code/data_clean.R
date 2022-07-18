@@ -12,28 +12,30 @@ before <- 2010
 after <- 2017
 
 # subset
-names(median_household_income_county_race)[match(paste0("B19013", LETTERS[c(1 ,2, 4)], "_001E"), names(median_household_income_county_race))] <- paste0("B19013", LETTERS[c(1 ,2, 4)])
-label(median_household_income_county_race$B19013A) <- "White Alone"
-label(median_household_income_county_race$B19013B) <- "Black or African American Alone"
-label(median_household_income_county_race$B19013D) <- "Asian Alone"
-
-income_before <- median_household_income_county_race[which(median_household_income_county_race$year == before),]
-income_after <- median_household_income_county_race[which(median_household_income_county_race$year == after),]
-median_household_income_county_race <- merge(income_before, income_after, by = "fips")
-median_household_income_county_race[median_household_income_county_race == -666666666] <- NA
-median_household_income_county_race <- na.omit(median_household_income_county_race)
-income_before <- median_household_income_county_race[c("fips", "year.x", "B19013A.x", "B19013B.x", "B19013D.x")]
-income_after <- median_household_income_county_race[c("fips", "year.y", "B19013A.y", "B19013B.y", "B19013D.y")]
-colnames(income_after) <- colnames(income_before)
-median_household_income_county_race <- rbind(income_before, income_after)
-wage_gap <- median_household_income_county_race["fips"]
-wage_gap$year <- median_household_income_county_race$year.x
-wage_gap$wage_gap_B_W <- median_household_income_county_race$B19013B.x/median_household_income_county_race$B19013A.x
-wage_gap$wage_gap_A_W <- median_household_income_county_race$B19013D.x/median_household_income_county_race$B19013A.x
+bf_median_earning <- median_earning_county[which(median_earning_county$year == before),]
+af_median_earning <- median_earning_county[which(median_earning_county$year == after),]
+median_earning_county <- merge(bf_median_earning, af_median_earning, by = "fips")
+median_earning_county[median_earning_county == -666666666] <- NA
+median_earning_county <- na.omit(median_earning_county)
+bf_median_earning <- median_earning_county[c("fips", "year.x", "B20017A_001E.x", "B20017B_001E.x", "B20017D_001E.x")]
+af_median_earning <- median_earning_county[c("fips", "year.y", "B20017A_001E.y", "B20017B_001E.y", "B20017D_001E.y")]
+colnames(af_median_earning) <- colnames(bf_median_earning)
+median_earning_county <- rbind(af_median_earning, bf_median_earning)
+wage_gap <- median_earning_county["fips"]
+wage_gap$year <- median_earning_county$year.x
+wage_gap$wage_gap_B_W <- median_earning_county$B20017B_001E.x / median_earning_county$B20017A_001E.x
+wage_gap$wage_gap_A_W <- median_earning_county$B20017D_001E.x / median_earning_county$B20017A_001E.x
 wage_gap$time <- wage_gap$year == after
 wage_gap$ID <- paste0(wage_gap$year, wage_gap$fips)
 wage_gap$state <- sapply(wage_gap$fips, fips2state)
 wage_gap$county <- sapply(wage_gap$fips, fips2county)
+
+# age
+age_pop_county$ID <- paste0(age_pop_county$year, age_pop_county$fips)
+age <- age_pop_county["ID"]
+age$age_W <- age_pop_county$B01002A_001E
+age$age_B <- age_pop_county$B01002B_001E
+age$age_A <- age_pop_county$B01002D_001E
 
 # min wage
 minwage_state_year <- read.csv("data/minimum_wage.csv")
@@ -47,15 +49,16 @@ minwage_state_year <- merge(minwage_state_year_before, minwage_state_year_after,
 minwage_state_year <- minwage_state_year[,!(names(minwage_state_year) %in% c("year.x", "year.y"))]
 minwage_state_year$dif <- round(minwage_state_year$`after.State.Minimum.Wage` - minwage_state_year$`before.State.Minimum.Wage`, 2)
 minwage_state_year$trt <- !(minwage_state_year$dif == 0)
-# minwage_state_year <- onehotencoding(minwage_state_year, "dif")
+minwage_state_year$fuzzy_trt <- minwage_state_year$dif / max(minwage_state_year$dif)
+minwage_state_year <- onehotencoding(minwage_state_year, "dif")
 
 # bachelor
 names(bachelor_county_race)[match(paste0("B19301", LETTERS[c(1 ,2, 4)], "_001E"), names(bachelor_county_race))] <- paste0("B19301", LETTERS[c(1 ,2, 4)])
 bachelor_county_race[bachelor_county_race == -666666666] <- NA
 edu_county <- bachelor_county_race["year"]
 edu_county$ID <- paste0(bachelor_county_race$year, bachelor_county_race$fips)
-edu_county$edu_county_B_W <- bachelor_county_race$B19301B / bachelor_county_race$B19301A
-edu_county$edu_county_A_W <- bachelor_county_race$B19301D / bachelor_county_race$B19301A
+edu_county$edu_B_W <- abs(bachelor_county_race$B19301B / bachelor_county_race$B19301A - 1)
+edu_county$edu_A_W <- abs(bachelor_county_race$B19301D / bachelor_county_race$B19301A - 1)
 
 # gdp
 real_gdp_county <- subset(real_gdp_county, TimePeriod %in% c(before, after))
@@ -98,6 +101,7 @@ df <- merge(df, total_unemp_county, by = "ID")
 df <- merge(df, total_pop_county, by = "ID")
 df <- merge(df, race_share, by = "ID")
 df <- merge(df, race_uer, by = "ID")
+df <- merge(df, age, by = "ID")
 df$year <- df$year.x
 df <- df[,!(names(df) %in% c("year.x", "year.y", "TimePeriod", "GeoFips"))]
 df$min_wage <- NA
@@ -122,8 +126,8 @@ df$density <- df$total_pop / df$area
 label(df$wage_gap_B_W) <- "Black and White wage gap"
 label(df$wage_gap_A_W) <- "Asian and White wage gap"
 label(df$time) <- "After treatment"
-label(df$edu_county_B_W) <- "Black and white edu_countycation gap"
-label(df$edu_county_A_W) <- "Asian and white edu_countycation gap"
+label(df$edu_B_W) <- "Black and white edu_countycation gap"
+label(df$edu_A_W) <- "Asian and white edu_countycation gap"
 label(df$gdp) <- "Total Real GDP (2012)"
 label(df$uer) <- "Total unemployment rate"
 label(df$min_wage) <- "State Minimum Wage"
@@ -139,6 +143,9 @@ label(df$density) <- "Population Density"
 label(df$uer_W) <- "Unemployment rate (White)"
 label(df$uer_B) <- "Unemployment rate (Black)"
 label(df$uer_A) <- "Unemployment rate (Asian)"
+label(df$age_W) <- "Median Age (White)"
+label(df$age_B) <- "Median Age (Black)"
+label(df$age_A) <- "Median Age (Asian)"
 
 # write csv
 save(df, file = "D:/github/thesis_2022/data/cleaned_data.RData")

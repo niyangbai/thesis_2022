@@ -19,7 +19,7 @@ period <- 2010:2017
 median_household_income <- paste0("B19013", LETTERS[c(1, 2, 4)], "_001E")
 per_capita_income <- paste0("B19301", LETTERS[c(1, 2, 4)], "_001E")
 median_earning <- paste0("B20017", LETTERS[c(1, 2, 4)], "_001E")
-bachelor <- paste0("C15010", LETTERS[c(1, 2, 4)], "_001E")
+highschool <- paste0("C15002", LETTERS[c(1, 2, 4)], "_004E")
 race_pop_share <- c("DP05_0037PE", "DP05_0038PE", "DP05_0044PE")
 total_pop <- c("DP05_0001E")
 race_unemp <- c("S2301_C04_012E", "S2301_C04_013E", "S2301_C04_015E")
@@ -35,7 +35,7 @@ urls <- paste0("https://www.bls.gov/lau/laucnty", period - 2000, ".xlsx")
 
 median_household_income_county_race <- get_acs5_data(econ_table_name, period, median_household_income)
 per_capita_income_county_race <- get_acs5_data(econ_table_name, period, per_capita_income)
-bachelor_county_race <- get_acs5_data(econ_table_name, period, per_capita_income)
+highschool_county_race <- get_acs5_data(econ_table_name, period, highschool)
 race_pop_share_county <- get_acs5_data(pop_table_name, period, race_pop_share)
 race_unemp_county <- get_acs5_data(emp_table_name, period, race_unemp)
 total_pop_county <- get_acs5_data(pop_table_name, period, total_pop)
@@ -45,7 +45,7 @@ age_pop_county <- get_acs5_data(econ_table_name, period, age_pop)
 median_earning_county <- get_acs5_data(econ_table_name, period, median_earning)
 
 # save data
-save(bachelor_county_race,
+save(highschool_county_race,
      real_gdp_county,
      median_household_income_county_race,
      race_pop_share_county,

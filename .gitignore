@@ -11,6 +11,10 @@
 # Example code in package build process
 *-Ex.R
 
+#Notebook
+notebooks/*.html
+notebooks/*.pdf
+
 # Output files from R CMD build
 /*.tar.gz
 

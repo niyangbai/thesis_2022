@@ -1,6 +1,8 @@
-# min wage plot
+rm(list = ls())
+setwd("D:/github/wagegap22")
 library(usmap)
 library(ggplot2)
+library(wagegap22package)
 
 plot_usmap(data = df[which(df$year=='2017'),], values = "State.Minimum.Wage", color = "black") +
   scale_fill_continuous(

@@ -1,0 +1,8 @@
+---
+title: "Data Exploration"
+output: html_notebook
+---
+
+```{r}
+load("D:/github/wagegap22/data/cleaned_data.RData")
+```

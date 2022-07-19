@@ -1,6 +1,6 @@
 rm(list = ls())
-setwd("D:/github/thesis_2022")
-library(thesis2022)
+setwd("D:/github/wagegap22")
+library(wagegap22package)
 library(openxlsx)
 library(censusapi)
 library(bea.R)
@@ -54,7 +54,7 @@ save(highschool_county_race,
      age_pop_county,
      poverty_county,
      race_emp_county,
-     file = "D:/github/thesis_2022/data/raw_data.RData")
+     file = "D:/github/wagegap22/data/raw_data.RData")
 
 # data <- getCensus(
 #         name = "acs/acs5",

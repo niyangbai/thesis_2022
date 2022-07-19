@@ -1,6 +1,6 @@
 rm(list = ls())
-setwd("D:/github/thesis_2022")
-library(thesis2022)
+setwd("D:/github/wagegap22")
+library(wagegap22package)
 library(Hmisc)
 library(tidyr)
 
@@ -193,4 +193,4 @@ label(df$po_rate_B) <- "Poverty Rate (Black)"
 label(df$po_rate_A) <- "Poverty Rate (Asian)"
 
 # write csv
-save(df, file = "D:/github/thesis_2022/data/cleaned_data.RData")
+save(df, file = "D:/github/wagegap22/data/cleaned_data.RData")

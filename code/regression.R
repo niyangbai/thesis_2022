@@ -1,6 +1,6 @@
 rm(list = ls())
-setwd("D:/github/thesis_2022")
-library(thesis2022)
+setwd("D:/github/wagegap22")
+library(wagegap22package)
 
 # read data
 load("data/cleaned_data.RData")

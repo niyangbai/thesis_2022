@@ -7,6 +7,9 @@ To install the necessary functions, please follow the code below:
 library(devtools)
 install_github("niyangbai/wagegap22package")
 ```
+
+---
+
 2012/2017
 
 Ethical Wage Gap among White, Black and Asian

@@ -12,6 +12,6 @@ install_github("niyangbai/wagegap22package")
 
 2012/2017
 
-Ethical Wage Gap among White, Black and Asian
+Ethic Wage Gap among White, Black and Asian
 
 Difference-in-Difference

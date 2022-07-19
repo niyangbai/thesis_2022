@@ -28,7 +28,7 @@ poverty <- c("B17001_001E", "B17001A_001E", "B17001B_001E", "B17001D_001E")
 acs5 <- "acs/acs5"
 subject <- "acs/acs5/subject"
 
-real_gdp <- "CAGDP9"
+real_gdp <- "CAGDP1"
 line_code_gdp <- 1
 urls <- paste0("https://www.bls.gov/lau/laucnty", period - 2000, ".xlsx")
 

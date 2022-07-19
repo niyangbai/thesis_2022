@@ -17,6 +17,6 @@ head(df[c("ID", "state", "county", "wage_gap_B_W")])
 ```{r}
 plot_usmap(data = df[which(df$year=='2017'),], values = "wage_gap_B_W", color = "black") +
   scale_fill_continuous(
-    low = "white", high = "blue", name = "Wage Gap between White and Black (2017)", label = scales::comma
-  ) + theme(legend.position = "button")
+    low = "green", high = "red", name = "Wage Gap between White and Black (2017)", label = scales::comma
+  ) + theme(legend.position = "top")
 ```

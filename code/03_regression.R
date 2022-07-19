@@ -18,6 +18,7 @@ df$gdp_per_capita <- log(df$gdp_per_capita)
 df$density <- log(df$density)
 df$age_rate_B <- log(df$age_rate_B)
 df$age_rate_W <- log(df$age_rate_W)
+df$po_rate_T <- log(df$po_rate_T)
 df$po_rate_W <- log(df$po_rate_W)
 df$po_rate_B <- log(df$po_rate_B)
 
@@ -25,5 +26,5 @@ df$po_rate_B <- log(df$po_rate_B)
 df <- do.call(data.frame, lapply(df, function(value) replace(value, is.infinite(value),NA)))
 
 # reg black white
-didreg_B_W <- lm(wage_gap_B_W ~ trt * time + edu_rate_B + edu_rate_W + share_B + share_W + emp_B + emp_W + age_B + age_W + density + is_Midwest + is_Northeast + is_South, data = df)
+didreg_B_W <- lm(wage_gap_B_W ~ trt * time + edu_rate_B + edu_rate_W + share_B + share_W + emp_B + emp_W + age_B + age_W + density + gdp_per_capita + is_Midwest + is_Northeast + is_South, data = df)
 summary(didreg_B_W)

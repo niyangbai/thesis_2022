@@ -60,7 +60,6 @@ edu$edu_A <- highschool_county_race$C15002D_003E + highschool_county_race$C15002
 
 # gdp
 real_gdp_county <- subset(real_gdp_county, TimePeriod %in% c(before, after))
-real_gdp_county[real_gdp_county == "character(0)"] <- NA
 real_gdp_county$gdp <- real_gdp_county$DataValue
 real_gdp_county <- real_gdp_county[,c("TimePeriod", "GeoFips", "gdp")]
 real_gdp_county$ID <- paste0(real_gdp_county$TimePeriod, real_gdp_county$GeoFips)

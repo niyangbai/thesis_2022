@@ -4,7 +4,7 @@
 \alias{get_acs5_data}
 \title{get acs5 data}
 \usage{
-get_acs5_data(table_name, period, data_code)
+get_acs5_data(table_name, period, data_code, group_code = NA)
 }
 \arguments{
 \item{data_code}{}

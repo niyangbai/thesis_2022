@@ -8,7 +8,7 @@ library(tidyr)
 load("data/raw_data.RData")
 
 # set time
-before <- 2010
+before <- 2012
 after <- 2017
 
 # subset
@@ -98,6 +98,9 @@ race_pop$pop_A <- race_pop_county$B01001D_001E
 race_pop$pop_T <- race_pop_county$B01001_001E
 race_pop$pop_F <- race_pop_county$B01001_026E
 
+# county area
+area <- landarea[c("fips", "area")]
+
 # merge
 df <- merge(wage_gap, minwage_state_year, by = "state")
 df <- merge(df, edu, by = "ID")
@@ -107,6 +110,7 @@ df <- merge(df, race_pop, by = "ID")
 df <- merge(df, race_emp, by = "ID")
 df <- merge(df, age, by = "ID")
 df <- merge(df, poverty, by = "ID")
+df <- merge(df, area, by = "fips")
 df <- df[,!(names(df) %in% c("year.x", "year.y", "TimePeriod", "GeoFips"))]
 df$min_wage <- NA
 for (i in 1:nrow(df)) {
@@ -122,9 +126,8 @@ df <- df[,!(names(df) %in% c("after.State.Minimum.Wage", "before.State.Minimum.W
 # gdp per capita
 df$gdp_per_capita <- df$gdp / df$pop_T
 
-# density !!!!!!!!!!
-df$area <- as.numeric(sapply(df$state, state2area)) ###
-df$density <- df$pop_T / df$area ###
+# density
+df$density <- df$pop_T / df$area
 
 # pop share
 df$share_W <- df$pop_W / df$pop_T

@@ -102,14 +102,14 @@ area <- landarea[c("fips", "area")]
 
 # merge
 df <- merge(wage_gap, minwage_state_year, by = "state")
-df <- merge(df, edu, by = "ID")
-df <- merge(df, real_gdp_county, by = "ID")
-df <- merge(df, total_unemp_county, by = "ID")
-df <- merge(df, race_pop, by = "ID")
-df <- merge(df, race_emp, by = "ID")
-df <- merge(df, age, by = "ID")
-df <- merge(df, poverty, by = "ID")
-df <- merge(df, area, by = "fips")
+df <- merge(df, edu, by = "ID", all.x = TRUE)
+df <- merge(df, real_gdp_county, by = "ID", all.x = TRUE)
+df <- merge(df, total_unemp_county, by = "ID", all.x = TRUE)
+df <- merge(df, race_pop, by = "ID", all.x = TRUE)
+df <- merge(df, race_emp, by = "ID", all.x = TRUE)
+df <- merge(df, age, by = "ID", all.x = TRUE)
+df <- merge(df, poverty, by = "ID", all.x = TRUE)
+df <- merge(df, area, by = "fips", all.x = TRUE)
 df <- df[,!(names(df) %in% c("year.x", "year.y", "TimePeriod", "GeoFips"))]
 df$min_wage <- NA
 for (i in 1:nrow(df)) {

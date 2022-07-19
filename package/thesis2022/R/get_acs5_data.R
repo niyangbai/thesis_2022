@@ -8,7 +8,7 @@
 #' @export
 #'
 #' @examples
-get_acs5_data <- function(table_name, period, data_code) {
+get_acs5_data <- function(table_name, period, data_code, group_code = NA) {
   df <- data.frame()
   for (year in period) {
     data <- getCensus(

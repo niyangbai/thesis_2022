@@ -19,28 +19,29 @@ period <- 2010:2017
 median_household_income <- paste0("B19013", LETTERS[c(1, 2, 4)], "_001E")
 per_capita_income <- paste0("B19301", LETTERS[c(1, 2, 4)], "_001E")
 median_earning <- paste0("B20017", LETTERS[c(1, 2, 4)], "_001E")
-highschool <- paste0("C15002", LETTERS[c(1, 2, 4)], "_004E")
-race_pop <- c("DP05_0001E", "DP05_0037E", "DP05_0038E", "DP05_0044E")
-race_unemp <- c("S2301_C04_012E", "S2301_C04_013E", "S2301_C04_015E")
+highschool <- c("C15002A_003E", "C15002A_008E", "C15002B_003E", "C15002B_008E", "C15002D_003E", "C15002D_008E")
+race_pop <- c("B01001_001E", "B01001_026E", "B01001A_001E", "B01001B_001E", "B01001D_001E")
+race_emp <- c("S2301_C03_012E", "S2301_C03_013E", "S2301_C03_015E")
 age_pop <- c("B01002A_001E", "B01002B_001E", "B01002D_001E")
+poverty <- c("B17001_001E", "B17001A_001E", "B17001B_001E", "B17001D_001E")
 
-econ_table_name <- "acs/acs5"
-pop_table_name <- "acs/acs5/profile"
-emp_table_name <- "acs/acs5/subject"
+acs5 <- "acs/acs5"
+subject <- "acs/acs5/subject"
 
 real_gdp <- "CAGDP9"
 line_code_gdp <- 1
 urls <- paste0("https://www.bls.gov/lau/laucnty", period - 2000, ".xlsx")
 
-median_household_income_county_race <- get_acs5_data(econ_table_name, period, median_household_income)
-per_capita_income_county_race <- get_acs5_data(econ_table_name, period, per_capita_income)
-highschool_county_race <- get_acs5_data(econ_table_name, period, highschool)
-race_pop_county <- get_acs5_data(pop_table_name, period, race_pop)
-race_unemp_county <- get_acs5_data(emp_table_name, period, race_unemp)
 real_gdp_county <- get_bea_data(beaKey, real_gdp, line_code_gdp, period)
+median_household_income_county_race <- get_acs5_data(acs5, period, median_household_income)
+per_capita_income_county_race <- get_acs5_data(acs5, period, per_capita_income)
+highschool_county_race <- get_acs5_data(acs5, period, highschool)
+race_pop_county <- get_acs5_data(acs5, period, race_pop)
+race_emp_county <- get_acs5_data(subject, period, race_emp)
+age_pop_county <- get_acs5_data(acs5, period, age_pop)
+median_earning_county <- get_acs5_data(acs5, period, median_earning)
+poverty_county <- get_acs5_data(acs5, period, poverty)
 total_unemp_county <- get_unemp_from_bls(urls)
-age_pop_county <- get_acs5_data(econ_table_name, period, age_pop)
-median_earning_county <- get_acs5_data(econ_table_name, period, median_earning)
 
 # save data
 save(highschool_county_race,
@@ -51,12 +52,12 @@ save(highschool_county_race,
      per_capita_income_county_race,
      total_unemp_county,
      age_pop_county,
-     race_unemp_county,
+     poverty_county,
+     race_emp_county,
      file = "D:/github/thesis_2022/data/raw_data.RData")
-
 
 # data <- getCensus(
 #         name = "acs/acs5",
 #         vintage = 2016,
-#         vars = "B20017A_001E",
+#         vars = "group(C15002A)",
 #         region = "county:*")

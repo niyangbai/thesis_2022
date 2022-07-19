@@ -40,3 +40,17 @@ fips2county <- function(fips) {
   name <- toString(fips_code$county_name[i])
   return(name)
 }
+
+#' fips code to region
+#'
+#' @param fips
+#'
+#' @return
+#' @export
+#'
+#' @examples
+fips2region <- function(fips) {
+  i <- which(fips_code$fips == as.numeric(fips))
+  region <- toString(fips_code$region_name[i])
+  return(region)
+}

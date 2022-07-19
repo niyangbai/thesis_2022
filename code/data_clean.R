@@ -31,8 +31,7 @@ wage_gap$state <- sapply(wage_gap$fips, fips2state)
 wage_gap$county <- sapply(wage_gap$fips, fips2county)
 
 # min wage
-minwage_state_year <- read.csv("data/minimum_wage.csv")
-minwage_state_year <- subset(minwage_state_year, year %in% seq(2010, 2017))
+minwage_state_year <- subset(minimum_wage, year %in% seq(2010, 2017))
 minwage_state_year <- subset(minwage_state_year, select = c("year", "state", "State.Minimum.Wage"))
 minwage_state_year_before <- subset(minwage_state_year, year == before)
 names(minwage_state_year_before)[names(minwage_state_year_before) == "State.Minimum.Wage"] <- "before.State.Minimum.Wage"

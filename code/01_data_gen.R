@@ -14,7 +14,7 @@ Sys.setenv(CENSUS_KEY="4e3f1cfec3b1cf56e92475e26ed86fdccea1fa62")
 beaKey <- "780D17CC-7441-4E52-93BF-2B3D89DBDF74"
 blsKey <- "937fa907e9364beba6dad4a5994f42eb"
 
-period <- 2010:2017
+period <- 2010:2019
 
 median_household_income <- paste0("B19013", LETTERS[c(1, 2, 4)], "_001E")
 per_capita_income <- paste0("B19301", LETTERS[c(1, 2, 4)], "_001E")
@@ -23,7 +23,7 @@ highschool <- c("C15002A_003E", "C15002A_008E", "C15002B_003E", "C15002B_008E", 
 race_pop <- c("B01001_001E", "B01001_026E", "B01001A_001E", "B01001B_001E", "B01001D_001E")
 race_emp <- c("S2301_C03_012E", "S2301_C03_013E", "S2301_C03_015E")
 age_pop <- c("B01002A_001E", "B01002B_001E", "B01002D_001E")
-poverty <- c("B17001_001E", "B17001A_001E", "B17001B_001E", "B17001D_001E")
+poverty <- c("B17001_002E", "B17001A_002E", "B17001B_002E", "B17001D_002E")
 
 acs5 <- "acs/acs5"
 subject <- "acs/acs5/subject"
@@ -41,7 +41,6 @@ race_emp_county <- get_acs5_data(subject, period, race_emp)
 age_pop_county <- get_acs5_data(acs5, period, age_pop)
 median_earning_county <- get_acs5_data(acs5, period, median_earning)
 poverty_county <- get_acs5_data(acs5, period, poverty)
-total_unemp_county <- get_unemp_from_bls(urls)
 
 # save data
 save(highschool_county_race,
@@ -50,7 +49,6 @@ save(highschool_county_race,
      race_pop_county,
      median_earning_county,
      per_capita_income_county_race,
-     total_unemp_county,
      age_pop_county,
      poverty_county,
      race_emp_county,

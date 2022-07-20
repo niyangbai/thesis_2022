@@ -4,17 +4,10 @@ library(usmap)
 library(ggplot2)
 library(wagegap22package)
 
-plot_usmap(data = df[which(df$year=='2017'),], values = "State.Minimum.Wage", color = "black") +
-  scale_fill_continuous(
-    low = "white", high = "blue", name = "Minimum Wage (2017)", label = scales::comma
-  ) + theme(legend.position = "right")
+# read data
+load("data/cleaned_data.RData")
 
-plot_usmap(data = df[which(df$year=='2010'),], values = "State.Minimum.Wage", color = "black") +
+plot_usmap(data = df[which(df$year=='2017'), c("wage_gap_B_W", "fips")], values = "wage_gap_B_W", color = "black") +
   scale_fill_continuous(
-    low = "white", high = "red", name = "Minimum Wage (2010)", label = scales::comma
-  ) + theme(legend.position = "right")
-
-plot_usmap(data = minwage_state_year_dif, values = "dif", color = "black", labels = TRUE) +
-  scale_fill_continuous(
-    low = "white", high = "red", name = "Minimum Wage (2010)", label = scales::comma
-  ) + theme(legend.position = "right")
+    low = "red", high = "green", na.value="white", name = "Wage Gap between White and Black (2017)", label = scales::comma
+  ) + theme(legend.position = "top")

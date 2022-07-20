@@ -8,8 +8,8 @@ library(tidyr)
 load("data/raw_data.RData")
 
 # set time
-before <- 2012
-after <- 2017
+before <- 2010
+after <- 2013
 
 # subset
 bf_median_earning <- median_earning_county[which(median_earning_county$year == before),]
@@ -31,7 +31,7 @@ wage_gap$state <- sapply(wage_gap$fips, fips2state)
 wage_gap$county <- sapply(wage_gap$fips, fips2county)
 
 # min wage
-minwage_state_year <- subset(minimum_wage, year %in% seq(2010, 2017))
+minwage_state_year <- subset(minimum_wage, year %in% seq(before, after))
 minwage_state_year <- subset(minwage_state_year, select = c("year", "state", "State.Minimum.Wage"))
 minwage_state_year_before <- subset(minwage_state_year, year == before)
 names(minwage_state_year_before)[names(minwage_state_year_before) == "State.Minimum.Wage"] <- "before.State.Minimum.Wage"
@@ -42,7 +42,7 @@ minwage_state_year <- minwage_state_year[,!(names(minwage_state_year) %in% c("ye
 minwage_state_year$dif <- round(minwage_state_year$`after.State.Minimum.Wage` - minwage_state_year$`before.State.Minimum.Wage`, 2)
 minwage_state_year$trt <- !(minwage_state_year$dif == 0)
 minwage_state_year$fuzzy_trt <- minwage_state_year$dif / max(minwage_state_year$dif)
-minwage_state_year <- onehotencoding(minwage_state_year, "dif")
+# minwage_state_year <- onehotencoding(minwage_state_year, "dif")
 
 # age
 age_pop_county$ID <- paste0(age_pop_county$year, age_pop_county$fips)
@@ -64,14 +64,7 @@ real_gdp_county$gdp <- real_gdp_county$DataValue
 real_gdp_county <- real_gdp_county[,c("TimePeriod", "GeoFips", "gdp")]
 real_gdp_county$ID <- paste0(real_gdp_county$TimePeriod, real_gdp_county$GeoFips)
 
-# employment rate
-colnames(total_unemp_county)[2:3] <- c("state", "county")
-total_unemp_county$fips <- paste0(total_unemp_county$state, total_unemp_county$county)
-real_gdp_county[real_gdp_county == "character(0)"] <- NA
-total_unemp_county$uer <- total_unemp_county$`(%)`
-total_unemp_county$ID <- paste0(total_unemp_county$Year, total_unemp_county$fips)
-total_unemp_county <- total_unemp_county[,c("ID", "uer")]
-
+# labor force
 race_emp_county$ID <- paste0(race_emp_county$year, race_emp_county$fips)
 race_emp <- race_emp_county["ID"]
 race_emp$emp_W <- race_emp_county$S2301_C03_012E
@@ -82,10 +75,10 @@ race_emp[race_emp == -666666666] <- NA
 # poverty
 poverty_county$ID <- paste0(poverty_county$year, poverty_county$fips)
 poverty <- poverty_county["ID"]
-poverty$poverty_W <- poverty_county$B17001A_001E
-poverty$poverty_B <- poverty_county$B17001B_001E
-poverty$poverty_A <- poverty_county$B17001D_001E
-poverty$poverty_T <- poverty_county$B17001_001E
+poverty$poverty_W <- poverty_county$B17001A_002E
+poverty$poverty_B <- poverty_county$B17001B_002E
+poverty$poverty_A <- poverty_county$B17001D_002E
+poverty$poverty_T <- poverty_county$B17001_002E
 
 # Ethical population
 race_pop_county$ID <- paste0(race_pop_county$year, race_pop_county$fips)
@@ -103,7 +96,6 @@ area <- landarea[c("fips", "area")]
 df <- merge(wage_gap, minwage_state_year, by = "state")
 df <- merge(df, edu, by = "ID", all.x = TRUE)
 df <- merge(df, real_gdp_county, by = "ID", all.x = TRUE)
-df <- merge(df, total_unemp_county, by = "ID", all.x = TRUE)
 df <- merge(df, race_pop, by = "ID", all.x = TRUE)
 df <- merge(df, race_emp, by = "ID", all.x = TRUE)
 df <- merge(df, age, by = "ID", all.x = TRUE)
@@ -120,32 +112,15 @@ for (i in 1:nrow(df)) {
 }
 df <- df[,!(names(df) %in% c("after.State.Minimum.Wage", "before.State.Minimum.Wage", "dif"))]
 
-# calculation
-# gdp per capita
-df$gdp_per_capita <- df$gdp / df$pop_T
-
-# density
-df$density <- df$pop_T / df$area
-
-# pop share
-df$share_W <- df$pop_W / df$pop_T
-df$share_B <- df$pop_B / df$pop_T
-df$share_A <- df$pop_A / df$pop_T
-df$share_F <- df$pop_F / df$pop_T
-
-# poverty rate by race
-df$po_rate_T <- df$poverty_T / df$pop_T
-df$po_rate_W <- df$poverty_W / df$pop_W
-df$po_rate_B <- df$poverty_B / df$pop_B
-df$po_rate_A <- df$poverty_A / df$pop_A
-
-# edu rate by race
-df$edu_rate_A <- df$edu_A / df$pop_A
-df$edu_rate_B <- df$edu_B / df$pop_B
-df$edu_rate_W <- df$edu_W / df$pop_W
-
 # region dummy
 df$region <- sapply(df$fips, fips2region)
+
+# calculation
+df$emp_A <- df$emp_A * df$pop_A / 100
+df$emp_W <- df$emp_W * df$pop_W / 100
+df$emp_B <- df$emp_B * df$pop_B / 100
+
+# one hot encoding
 df <- onehotencoding(df, "region")
 
 # label
@@ -155,40 +130,32 @@ label(df$time) <- "After treatment"
 label(df$edu_B) <- "High School (Black)"
 label(df$edu_A) <- "High School (Asian)"
 label(df$edu_W) <- "High School (White)"
-label(df$edu_rate_B) <- "High School Rate (Black)"
-label(df$edu_rate_A) <- "High School Rate (Asian)"
-label(df$edu_rate_W) <- "High School Rate (White)"
+label(df$emp_W) <- "Employment (White)"
+label(df$emp_A) <- "Employment (Asian)"
+label(df$emp_B) <- "Employment (Black)"
 label(df$gdp) <- "Total Real GDP (2012)"
-label(df$uer) <- "Total unemployment rate"
 label(df$min_wage) <- "State Minimum Wage"
 label(df$trt) <- "Treatment group"
 label(df$fuzzy_trt) <- "Fuzzy Treatment"
 label(df$pop_T) <- "Total Population"
-label(df$gdp_per_capita) <- "GDP per Capita (2012)"
 label(df$pop_W) <- "White Population"
 label(df$pop_B) <- "Black Population"
 label(df$pop_A) <- "Asian Population"
 label(df$pop_F) <- "Female Population"
 label(df$area) <- "State Area (sq mi)"
-label(df$density) <- "Population Density"
-label(df$emp_W) <- "Employment rate (White)"
-label(df$emp_B) <- "Employment rate (Black)"
-label(df$emp_A) <- "Employment rate (Asian)"
 label(df$age_W) <- "Median Age (White)"
 label(df$age_B) <- "Median Age (Black)"
 label(df$age_A) <- "Median Age (Asian)"
-label(df$share_W) <- "White Share"
-label(df$share_B) <- "Black Share"
-label(df$share_A) <- "Asian Share"
-label(df$share_F) <- "Female Share"
 label(df$poverty_W) <- "Poverty (White)"
 label(df$poverty_B) <- "Poverty (Black)"
 label(df$poverty_A) <- "Poverty (Asian)"
 label(df$poverty_T) <- "Poverty (Total)"
-label(df$po_rate_T) <- "Poverty Rate (Total)"
-label(df$po_rate_W) <- "Poverty Rate (White)"
-label(df$po_rate_B) <- "Poverty Rate (Black)"
-label(df$po_rate_A) <- "Poverty Rate (Asian)"
+main_df <- df
+
+# placebo test
+placebo_df <- df
 
 # write csv
-save(df, file = "D:/github/wagegap22/data/cleaned_data.RData")
+save(main_df, 
+     placebo_df,
+     file = "D:/github/wagegap22/data/main_cleaned_data.RData")

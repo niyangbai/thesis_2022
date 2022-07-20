@@ -3,28 +3,22 @@ setwd("D:/github/wagegap22")
 library(wagegap22package)
 
 # read data
-load("data/cleaned_data.RData")
+load("data/main_cleaned_data.RData")
 
 # log
-df$wage_gap_B_W <- log(df$wage_gap_B_W)
-df$share_B <- log(df$share_B)
-df$share_W <- log(df$share_W)
-df$share_F <- log(df$share_F)
-df$emp_B <- log(df$emp_B)
-df$emp_W <- log(df$emp_W)
-df$edu_rate_B <- log(df$edu_rate_B)
-df$edu_rate_W <- log(df$edu_rate_W)
-df$gdp_per_capita <- log(df$gdp_per_capita)
-df$density <- log(df$density)
-df$age_rate_B <- log(df$age_rate_B)
-df$age_rate_W <- log(df$age_rate_W)
-df$po_rate_T <- log(df$po_rate_T)
-df$po_rate_W <- log(df$po_rate_W)
-df$po_rate_B <- log(df$po_rate_B)
+nolog <- c("fips", "ID", "state", "year", 
+           "wage_gap_B_W", "wage_gap_A_W", "time", "county",
+           "trt", "fuzzy_trt", "region", "min_wage")
+bo <- names(main_df)[unname(sapply(names(main_df), function(x) grepl("is_", x, fixed = TRUE)))]
+nolog <- append(nolog, bo)
+tolog <- names(main_df)[!(names(main_df) %in% nolog)]
+main_df <- df_log(main_df, tolog)
 
 # ignore inf
-df <- do.call(data.frame, lapply(df, function(value) replace(value, is.infinite(value),NA)))
+main_df <- do.call(data.frame, lapply(main_df, function(value) replace(value, is.infinite(value),NA)))
 
-# reg black white
-didreg_B_W <- lm(wage_gap_B_W ~ trt * time + edu_rate_B + edu_rate_W + share_B + share_W + emp_B + emp_W + age_B + age_W + density + gdp_per_capita + is_Midwest + is_Northeast + is_South, data = df)
+# reg
+didreg_B_W <- lm(wage_gap_B_W ~ trt * time, data = main_df)
+didreg_A_W <- lm(wage_gap_A_W ~ trt * time, data = main_df)
 summary(didreg_B_W)
+summary(didreg_A_W)

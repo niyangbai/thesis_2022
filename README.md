@@ -8,10 +8,15 @@ library(devtools)
 install_github("niyangbai/wagegap22package")
 ```
 
----
-
-2012/2017
-
-Ethic Wage Gap among White, Black and Asian
-
-Difference-in-Difference
+Project Organization
+```
+    .
+    ├── .gitignore
+    ├── LICENSE
+    ├── Readme.md
+    ├── outline.pdf
+    ├── code
+    ├── data
+    ├── notebooks
+    └── reference
+```

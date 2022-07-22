@@ -8,8 +8,8 @@ library(tidyr)
 load("data/raw_data.RData")
 
 # set time
-before <- 2010
-after <- 2013
+before <- 2013
+after <- 2016
 
 # subset
 bf_median_earning <- median_earning_county[which(median_earning_county$year == before),]

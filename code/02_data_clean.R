@@ -8,14 +8,16 @@ library(tidyr)
 load("data/raw_data.RData")
 
 # set time
-before <- 2013
-after <- 2016
+before <- 2010
+after <- 2015
 
 # subset
 bf_median_earning <- median_earning_county[which(median_earning_county$year == before),]
 af_median_earning <- median_earning_county[which(median_earning_county$year == after),]
 median_earning_county <- merge(bf_median_earning, af_median_earning, by = "fips")
 median_earning_county[median_earning_county == -666666666] <- NA
+median_earning_county[median_earning_county == 2499] <- NA
+median_earning_county[median_earning_county == 250001] <- NA
 median_earning_county <- na.omit(median_earning_county)
 bf_median_earning <- median_earning_county[c("fips", "year.x", "B20017A_001E.x", "B20017B_001E.x", "B20017D_001E.x")]
 af_median_earning <- median_earning_county[c("fips", "year.y", "B20017A_001E.y", "B20017B_001E.y", "B20017D_001E.y")]
@@ -46,6 +48,7 @@ minwage_state_year$fuzzy_trt <- minwage_state_year$dif / max(minwage_state_year$
 
 # age
 age_pop_county$ID <- paste0(age_pop_county$year, age_pop_county$fips)
+age_pop_county[age_pop_county == -666666666] <- NA
 age <- age_pop_county["ID"]
 age$age_W <- age_pop_county$B01002A_001E
 age$age_B <- age_pop_county$B01002B_001E

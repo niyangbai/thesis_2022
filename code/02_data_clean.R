@@ -88,6 +88,9 @@ race_pop$pop_B <- race_pop_county$B01001B_001E
 race_pop$pop_A <- race_pop_county$B01001D_001E
 race_pop$pop_T <- race_pop_county$B01001_001E
 race_pop$pop_F <- race_pop_county$B01001_026E
+race_pop$pop_F_W <- race_pop_county$B01001A_026E
+race_pop$pop_F_B <- race_pop_county$B01001B_026E
+race_pop$pop_F_A <- race_pop_county$B01001D_026E
 
 # county area
 area <- landarea[c("fips", "area")]
@@ -142,6 +145,9 @@ label(df$pop_W) <- "White Population"
 label(df$pop_B) <- "Black Population"
 label(df$pop_A) <- "Asian Population"
 label(df$pop_F) <- "Female Population"
+label(df$pop_F_W) <- "Female Population (White)"
+label(df$pop_F_B) <- "Female Population (Black)"
+label(df$pop_F_D) <- "Female Population (Asian)"
 label(df$area) <- "State Area (sq mi)"
 label(df$age_W) <- "Median Age (White)"
 label(df$age_B) <- "Median Age (Black)"
@@ -151,6 +157,23 @@ label(df$poverty_B) <- "Poverty (Black)"
 label(df$poverty_A) <- "Poverty (Asian)"
 label(df$poverty_T) <- "Poverty (Total)"
 main_df <- df
+
+# # calculation
+# main_df$edu_rate_B <- main_df$edu_B / main_df$pop_B
+# main_df$edu_rate_W <- main_df$edu_W / main_df$pop_W
+# main_df$edu_rate_A <- main_df$edu_A / main_df$pop_A
+# main_df$emp_rate_B <- main_df$emp_B / main_df$pop_B
+# main_df$emp_rate_A <- main_df$emp_A / main_df$pop_A
+# main_df$emp_rate_W <- main_df$emp_W / main_df$pop_W
+# main_df$gdp_per_capita <- main_df$gdp / main_df$pop_T
+# main_df$pop_share_W <- main_df$pop_W / main_df$pop_T
+# main_df$pop_share_A <- main_df$pop_A / main_df$pop_T
+# main_df$pop_share_B <- main_df$pop_B / main_df$pop_T
+# main_df$pop_share_F <- main_df$pop_F / main_df$pop_T
+# main_df$density <- main_df$area / main_df$pop_T
+# main_df$poverty_rate_A <- main_df$poverty_A / main_df$pop_A
+# main_df$poverty_rate_W <- main_df$poverty_W / main_df$pop_W
+# main_df$poverty_rate_B <- main_df$poverty_B / main_df$pop_B
 
 # placebo test
 placebo_df <- df

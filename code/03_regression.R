@@ -22,8 +22,16 @@ main_df <- do.call(data.frame, lapply(main_df, function(value) replace(value, is
 # omit NA
 main_df <- na.omit(main_df)
 
-# reg
-didreg_B_W <- lm(wage_gap_B_W ~ trt * time + area + edu_W + edu_B + gdp + pop_W + pop_B + pop_T + pop_F + emp_W + emp_B + age_W + age_B + poverty_W + poverty_B + is_Midwest + is_Northeast + is_South, data = main_df)
-didreg_A_W <- lm(wage_gap_A_W ~ trt * time + area + edu_W + edu_A + gdp + pop_W + pop_A + pop_T + pop_F + emp_W + emp_A + age_W + age_A + poverty_W + poverty_A + is_Midwest + is_Northeast + is_South, data = main_df)
+# # reg
+# didreg_B_W <- lm(wage_gap_B_W ~ trt * time + edu_rate_B + edu_rate_W + emp_rate_B + emp_rate_W + pop_share_B + pop_share_W + poverty_rate_W + poverty_rate_B + density + gdp_per_capita + is_Midwest + is_Northeast + is_South, data = main_df)
+# didreg_A_W <- lm(wage_gap_A_W ~ trt * time + edu_rate_A + edu_rate_W + emp_rate_A + emp_rate_W + pop_share_A + pop_share_W + poverty_rate_W + poverty_rate_A + density + gdp_per_capita + is_Midwest + is_Northeast + is_South, data = main_df)
+# summary(didreg_B_W)
+# summary(didreg_A_W)
+
+main_df$did <- main_df$trt * main_df$time
+
+didreg_B_W <- lm(wage_gap_B_W ~ did + area + edu_W + edu_B + gdp + pop_W + pop_B + pop_T + emp_W + emp_B + age_W + age_B + poverty_W + poverty_B + is_Midwest + is_Northeast + is_South, data = main_df)
+didreg_A_W <- lm(wage_gap_A_W ~ did + area + edu_W + edu_A + gdp + pop_W + pop_A + pop_T + emp_W + emp_A + age_W + age_A + poverty_W + poverty_A + is_Midwest + is_Northeast + is_South, data = main_df)
 summary(didreg_B_W)
 summary(didreg_A_W)
+

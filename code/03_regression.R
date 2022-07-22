@@ -19,6 +19,9 @@ for (i in tolog) {
 # ignore inf
 main_df <- do.call(data.frame, lapply(main_df, function(value) replace(value, is.infinite(value),NA)))
 
+# omit NA
+main_df <- na.omit(main_df)
+
 # reg
 didreg_B_W <- lm(wage_gap_B_W ~ trt * time + area + edu_W + edu_B + gdp + pop_W + pop_B + pop_T + pop_F + emp_W + emp_B + age_W + age_B + poverty_W + poverty_B + is_Midwest + is_Northeast + is_South, data = main_df)
 didreg_A_W <- lm(wage_gap_A_W ~ trt * time + area + edu_W + edu_A + gdp + pop_W + pop_A + pop_T + pop_F + emp_W + emp_A + age_W + age_A + poverty_W + poverty_A + is_Midwest + is_Northeast + is_South, data = main_df)

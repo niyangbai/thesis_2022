@@ -5,11 +5,9 @@ library(Hmisc)
 library(tidyr)
 library(dplyr)
 
-# !12-16
-# 11-16, 10-15, 16-19
-# 16-20, 10-16
 # set time
 before <- 2010
+treatment <- 2013
 after <- 2020
 
 #read data
@@ -17,37 +15,32 @@ load("data/raw_data.RData")
 
 # subset
 bf_median_earning <- median_earning_county[which(median_earning_county$year == before),]
+trt_median_earning <- median_earning_county[which(median_earning_county$year == treatment),]
 af_median_earning <- median_earning_county[which(median_earning_county$year == after),]
-median_earning_county <- merge(bf_median_earning, af_median_earning, by = "fips")
+median_earning_county <- merge(bf_median_earning, trt_median_earning, by = "fips")
+median_earning_county <- merge(median_earning_county, af_median_earning, by = "fips")
 median_earning_county[median_earning_county == -666666666] <- NA
-median_earning_county[median_earning_county == 2499] <- NA
-median_earning_county[median_earning_county == 250001] <- NA
+# median_earning_county[median_earning_county == 2499] <- NA
+# median_earning_county[median_earning_county == 250001] <- NA
 median_earning_county <- na.omit(median_earning_county)
 bf_median_earning <- median_earning_county[c("fips", "year.x", "B20017A_001E.x", "B20017B_001E.x", "B20017D_001E.x")]
-af_median_earning <- median_earning_county[c("fips", "year.y", "B20017A_001E.y", "B20017B_001E.y", "B20017D_001E.y")]
-colnames(af_median_earning) <- colnames(bf_median_earning)
-median_earning_county <- rbind(af_median_earning, bf_median_earning)
-wage_gap <- median_earning_county["fips"]
-wage_gap$year <- median_earning_county$year.x
-wage_gap$wage_gap_B_W <- median_earning_county$B20017B_001E.x / median_earning_county$B20017A_001E.x
-wage_gap$wage_gap_A_W <- median_earning_county$B20017D_001E.x / median_earning_county$B20017A_001E.x
-wage_gap$time <- wage_gap$year == after
-wage_gap$ID <- paste0(wage_gap$year, wage_gap$fips)
+trt_median_earning <- median_earning_county[c("fips", "year.y", "B20017A_001E.y", "B20017B_001E.y", "B20017D_001E.y")]
+af_median_earning <- median_earning_county[c("fips", "year", "B20017A_001E", "B20017B_001E", "B20017D_001E")]
+colnames(trt_median_earning) <- colnames(af_median_earning)
+colnames(bf_median_earning) <- colnames(af_median_earning)
+median_earning_county <- rbind(bf_median_earning, trt_median_earning, af_median_earning)
+wage_gap <- median_earning_county[c("fips", "year")]
 wage_gap$state <- sapply(wage_gap$fips, fips2state)
 wage_gap$county <- sapply(wage_gap$fips, fips2county)
+wage_gap$wage_gap_B_W <- median_earning_county$B20017B_001E / median_earning_county$B20017A_001E
+wage_gap$wage_gap_A_W <- median_earning_county$B20017D_001E / median_earning_county$B20017A_001E
+wage_gap$ID <- paste0(wage_gap$year, wage_gap$fips)
+
 
 # min wage
 minwage_state_year <- subset(minimum_wage, year %in% seq(2010, 2020))
-minwage_state_year <- subset(minwage_state_year, select = c("year", "state", "State.Minimum.Wage"))
-minwage_state_year_before <- subset(minwage_state_year, year == before)
-names(minwage_state_year_before)[names(minwage_state_year_before) == "State.Minimum.Wage"] <- "before.State.Minimum.Wage"
-minwage_state_year_after <- subset(minwage_state_year, year == after)
-names(minwage_state_year_after)[names(minwage_state_year_after) == "State.Minimum.Wage"] <- "after.State.Minimum.Wage"
-minwage_state_year <- merge(minwage_state_year_before, minwage_state_year_after, by = "state")
-minwage_state_year <- minwage_state_year[,!(names(minwage_state_year) %in% c("year.x", "year.y"))]
-minwage_state_year$dif <- round(minwage_state_year$`after.State.Minimum.Wage` - minwage_state_year$`before.State.Minimum.Wage`, 2)
-minwage_state_year$trt <- !(minwage_state_year$dif == 0)
-minwage_state_year$fuzzy_trt <- minwage_state_year$dif / max(minwage_state_year$dif)
+control_states <- find_difs(before, after)[find_difs(before, after)[["dif"]] == 0, "state"]
+treatment_states <- find_difs(before, after)[(find_difs(before, treatment)[["dif"]] == 0) & !(find_difs(treatment, after)[["dif"]] == 0), "state"]
 
 # age
 age_pop_county$ID <- paste0(age_pop_county$year, age_pop_county$fips)
@@ -65,10 +58,11 @@ edu$edu_B <- highschool_county_race$C15002B_003E + highschool_county_race$C15002
 edu$edu_A <- highschool_county_race$C15002D_003E + highschool_county_race$C15002D_008E
 
 # gdp
-real_gdp_county <- subset(real_gdp_county, TimePeriod %in% c(before, after))
-real_gdp_county$gdp <- real_gdp_county$DataValue
-real_gdp_county <- real_gdp_county[,c("TimePeriod", "GeoFips", "gdp")]
+real_gdp_county <- subset(real_gdp_county, TimePeriod %in% seq(2010, 2020))
 real_gdp_county$ID <- paste0(real_gdp_county$TimePeriod, real_gdp_county$GeoFips)
+real_gdp_county$gdp <- real_gdp_county$DataValue
+real_gdp_county <- real_gdp_county[,c("ID", "gdp")]
+
 
 # labor force
 race_emp_county$ID <- paste0(race_emp_county$year, race_emp_county$fips)
@@ -102,24 +96,14 @@ race_pop$pop_F_A <- race_pop_county$B01001D_026E
 area <- landarea[c("fips", "area")]
 
 # merge
-df <- merge(wage_gap, minwage_state_year, by = "state")
-df <- merge(df, edu, by = "ID", all.x = TRUE)
+df <- merge(wage_gap, edu, by = "ID", all.x = TRUE)
 df <- merge(df, real_gdp_county, by = "ID", all.x = TRUE)
 df <- merge(df, race_pop, by = "ID", all.x = TRUE)
 df <- merge(df, race_emp, by = "ID", all.x = TRUE)
 df <- merge(df, age, by = "ID", all.x = TRUE)
 df <- merge(df, poverty, by = "ID", all.x = TRUE)
 df <- merge(df, area, by = "fips", all.x = TRUE)
-df <- df[,!(names(df) %in% c("year.x", "year.y", "TimePeriod", "GeoFips"))]
-df$min_wage <- NA
-for (i in 1:nrow(df)) {
-  if (df$year[i] == after) {
-    df$min_wage[i] <- df$`after.State.Minimum.Wage`[i]
-  } else {
-    df$min_wage[i] <- df$`before.State.Minimum.Wage`[i]
-  }
-}
-df <- df[,!(names(df) %in% c("after.State.Minimum.Wage", "before.State.Minimum.Wage", "dif"))]
+df <- df[!is.na(df$gdp),]
 
 # region dummy
 df$region <- sapply(df$fips, fips2region)
@@ -132,10 +116,12 @@ df$emp_B <- df$emp_B * df$pop_B / 100
 # one hot encoding
 df <- onehotencoding(df, "region")
 
+# sign treatment group
+df$treatment <- df$state %in% treatment_states
+
 # label
 label(df$wage_gap_B_W) <- "Black and White wage gap"
 label(df$wage_gap_A_W) <- "Asian and White wage gap"
-label(df$time) <- "After treatment"
 label(df$edu_B) <- "High School (Black)"
 label(df$edu_A) <- "High School (Asian)"
 label(df$edu_W) <- "High School (White)"
@@ -143,9 +129,6 @@ label(df$emp_W) <- "Employment (White)"
 label(df$emp_A) <- "Employment (Asian)"
 label(df$emp_B) <- "Employment (Black)"
 label(df$gdp) <- "Total Real GDP (2012)"
-label(df$min_wage) <- "State Minimum Wage"
-label(df$trt) <- "Treatment group"
-label(df$fuzzy_trt) <- "Fuzzy Treatment"
 label(df$pop_T) <- "Total Population"
 label(df$pop_W) <- "White Population"
 label(df$pop_B) <- "Black Population"
@@ -162,33 +145,30 @@ label(df$poverty_W) <- "Poverty (White)"
 label(df$poverty_B) <- "Poverty (Black)"
 label(df$poverty_A) <- "Poverty (Asian)"
 label(df$poverty_T) <- "Poverty (Total)"
-main_df <- df
+label(df$region) <- "Geografical Region"
+label(df$treatment) <- "Treatment group"
+
 
 # # calculation
-# main_df$edu_rate_B <- main_df$edu_B / main_df$pop_B
-# main_df$edu_rate_W <- main_df$edu_W / main_df$pop_W
-# main_df$edu_rate_A <- main_df$edu_A / main_df$pop_A
-# main_df$emp_rate_B <- main_df$emp_B / main_df$pop_B
-# main_df$emp_rate_A <- main_df$emp_A / main_df$pop_A
-# main_df$emp_rate_W <- main_df$emp_W / main_df$pop_W
-# main_df$gdp_per_capita <- main_df$gdp / main_df$pop_T
-# main_df$pop_share_W <- main_df$pop_W / main_df$pop_T
-# main_df$pop_share_A <- main_df$pop_A / main_df$pop_T
-# main_df$pop_share_B <- main_df$pop_B / main_df$pop_T
-# main_df$pop_share_F <- main_df$pop_F / main_df$pop_T
-# main_df$pop_share_F_W <- main_df$pop_F_W / main_df$pop_W
-# main_df$pop_share_F_B <- main_df$pop_F_B / main_df$pop_B
-# main_df$pop_share_F_A <- main_df$pop_F_A / main_df$pop_A
-# main_df$density <- main_df$area / main_df$pop_T
-# main_df$poverty_rate_A <- main_df$poverty_A / main_df$pop_A
-# main_df$poverty_rate_W <- main_df$poverty_W / main_df$pop_W
-# main_df$poverty_rate_B <- main_df$poverty_B / main_df$pop_B
-# main_df$poverty_rate_T <- main_df$poverty_T / main_df$pop_T
-
-# placebo test
-placebo_df <- df
+# df$edu_rate_B <- df$edu_B / df$pop_B
+# df$edu_rate_W <- df$edu_W / df$pop_W
+# df$edu_rate_A <- df$edu_A / df$pop_A
+# df$emp_rate_B <- df$emp_B / df$pop_B
+# df$emp_rate_A <- df$emp_A / df$pop_A
+# df$emp_rate_W <- df$emp_W / df$pop_W
+# df$gdp_per_capita <- df$gdp / df$pop_T
+# df$pop_share_W <- df$pop_W / df$pop_T
+# df$pop_share_A <- df$pop_A / df$pop_T
+# df$pop_share_B <- df$pop_B / df$pop_T
+# df$pop_share_F <- df$pop_F / df$pop_T
+# df$pop_share_F_W <- df$pop_F_W / df$pop_W
+# df$pop_share_F_B <- df$pop_F_B / df$pop_B
+# df$pop_share_F_A <- df$pop_F_A / df$pop_A
+# df$density <- df$area / df$pop_T
+# df$poverty_rate_A <- df$poverty_A / df$pop_A
+# df$poverty_rate_W <- df$poverty_W / df$pop_W
+# df$poverty_rate_B <- df$poverty_B / df$pop_B
+# df$poverty_rate_T <- df$poverty_T / df$pop_T
 
 # write csv
-save(main_df, 
-     placebo_df,
-     file = "D:/github/wagegap22/data/main_cleaned_data.RData")
+save(df, before, treatment, after, file = "D:/github/wagegap22/data/cleaned_data.RData")

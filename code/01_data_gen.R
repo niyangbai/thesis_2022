@@ -28,13 +28,13 @@ poverty <- c("B17001_002E", "B17001A_002E", "B17001B_002E", "B17001D_002E")
 acs5 <- "acs/acs5"
 subject <- "acs/acs5/subject"
 
-real_gdp <- "CAGDP1"
+real_gdp <- "CAGDP9"
 line_code_gdp <- 1
 urls <- paste0("https://www.bls.gov/lau/laucnty", period - 2000, ".xlsx")
 
 real_gdp_county <- get_bea_data(beaKey, real_gdp, line_code_gdp, period)
-median_household_income_county_race <- get_acs5_data(acs5, period, median_household_income)
-per_capita_income_county_race <- get_acs5_data(acs5, period, per_capita_income)
+# median_household_income_county_race <- get_acs5_data(acs5, period, median_household_income)
+# per_capita_income_county_race <- get_acs5_data(acs5, period, per_capita_income)
 highschool_county_race <- get_acs5_data(acs5, period, highschool)
 race_pop_county <- get_acs5_data(acs5, period, race_pop)
 race_emp_county <- get_acs5_data(subject, period, race_emp)

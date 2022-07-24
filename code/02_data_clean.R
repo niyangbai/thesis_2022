@@ -7,17 +7,20 @@ library(tidyr)
 #read data
 load("data/raw_data.RData")
 
+# 11-12, 12-16, 11-16, 16-19
+# 10-15, 16-19
+# 16-20, 10-16
 # set time
-before <- 2010
-after <- 2015
+before <- 2011
+after <- 2016
 
 # subset
 bf_median_earning <- median_earning_county[which(median_earning_county$year == before),]
 af_median_earning <- median_earning_county[which(median_earning_county$year == after),]
 median_earning_county <- merge(bf_median_earning, af_median_earning, by = "fips")
 median_earning_county[median_earning_county == -666666666] <- NA
-median_earning_county[median_earning_county == 2499] <- NA
-median_earning_county[median_earning_county == 250001] <- NA
+# median_earning_county[median_earning_county == 2499] <- NA
+# median_earning_county[median_earning_county == 250001] <- NA
 median_earning_county <- na.omit(median_earning_county)
 bf_median_earning <- median_earning_county[c("fips", "year.x", "B20017A_001E.x", "B20017B_001E.x", "B20017D_001E.x")]
 af_median_earning <- median_earning_county[c("fips", "year.y", "B20017A_001E.y", "B20017B_001E.y", "B20017D_001E.y")]
@@ -150,7 +153,7 @@ label(df$pop_A) <- "Asian Population"
 label(df$pop_F) <- "Female Population"
 label(df$pop_F_W) <- "Female Population (White)"
 label(df$pop_F_B) <- "Female Population (Black)"
-label(df$pop_F_D) <- "Female Population (Asian)"
+label(df$pop_F_A) <- "Female Population (Asian)"
 label(df$area) <- "State Area (sq mi)"
 label(df$age_W) <- "Median Age (White)"
 label(df$age_B) <- "Median Age (Black)"
@@ -173,10 +176,14 @@ main_df <- df
 # main_df$pop_share_A <- main_df$pop_A / main_df$pop_T
 # main_df$pop_share_B <- main_df$pop_B / main_df$pop_T
 # main_df$pop_share_F <- main_df$pop_F / main_df$pop_T
+# main_df$pop_share_F_W <- main_df$pop_F_W / main_df$pop_W
+# main_df$pop_share_F_B <- main_df$pop_F_B / main_df$pop_B
+# main_df$pop_share_F_A <- main_df$pop_F_A / main_df$pop_A
 # main_df$density <- main_df$area / main_df$pop_T
 # main_df$poverty_rate_A <- main_df$poverty_A / main_df$pop_A
 # main_df$poverty_rate_W <- main_df$poverty_W / main_df$pop_W
 # main_df$poverty_rate_B <- main_df$poverty_B / main_df$pop_B
+# main_df$poverty_rate_T <- main_df$poverty_T / main_df$pop_T
 
 # placebo test
 placebo_df <- df

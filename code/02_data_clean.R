@@ -10,7 +10,7 @@ library(dplyr)
 # 16-20, 10-16
 # set time
 before <- 2010
-after <- 2016
+after <- 2020
 
 #read data
 load("data/raw_data.RData")
@@ -37,7 +37,7 @@ wage_gap$state <- sapply(wage_gap$fips, fips2state)
 wage_gap$county <- sapply(wage_gap$fips, fips2county)
 
 # min wage
-minwage_state_year <- subset(minimum_wage, year %in% seq(before, after))
+minwage_state_year <- subset(minimum_wage, year %in% seq(2010, 2020))
 minwage_state_year <- subset(minwage_state_year, select = c("year", "state", "State.Minimum.Wage"))
 minwage_state_year_before <- subset(minwage_state_year, year == before)
 names(minwage_state_year_before)[names(minwage_state_year_before) == "State.Minimum.Wage"] <- "before.State.Minimum.Wage"
@@ -47,9 +47,7 @@ minwage_state_year <- merge(minwage_state_year_before, minwage_state_year_after,
 minwage_state_year <- minwage_state_year[,!(names(minwage_state_year) %in% c("year.x", "year.y"))]
 minwage_state_year$dif <- round(minwage_state_year$`after.State.Minimum.Wage` - minwage_state_year$`before.State.Minimum.Wage`, 2)
 minwage_state_year$trt <- !(minwage_state_year$dif == 0)
-# minwage_state_year$fuzzy_trt <- minwage_state_year$dif / max(minwage_state_year$dif)
-minwage_state_year$categories <- cut(minwage_state_year$dif, breaks = c(-1, -0.001, 0, 1, 2, Inf), labels = c("low", "zero", "low", "medium", "high"))
-minwage_state_year <- onehotencoding(minwage_state_year, "categories")
+minwage_state_year$fuzzy_trt <- minwage_state_year$dif / max(minwage_state_year$dif)
 
 # age
 age_pop_county$ID <- paste0(age_pop_county$year, age_pop_county$fips)

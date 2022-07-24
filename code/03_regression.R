@@ -41,10 +41,13 @@ main_df <- na.omit(main_df)
 # didreg_B_W <- lm(wage_gap_B_W ~ trt * time + edu_rate_B + edu_rate_W + emp_rate_B + emp_rate_W + gdp_per_capita + pop_share_W + pop_share_B + pop_share_F + density + poverty_rate_B + poverty_rate_W + is_Midwest + is_Northeast + is_South, data = main_df)
 # didreg_A_W <- lm(wage_gap_A_W ~ trt * time + edu_rate_A + edu_rate_W + emp_rate_A + emp_rate_W + gdp_per_capita + pop_share_W + pop_share_A + pop_share_F + density + poverty_rate_A + poverty_rate_W + is_Midwest + is_Northeast + is_South, data = main_df)
 
-# didreg_B_W <- lm(wage_gap_B_W ~ trt * time, data = main_df)
-# didreg_A_W <- lm(wage_gap_A_W ~ trt * time, data = main_df)
-summary(didreg_B_W)
+# didreg_B_W <- lm(wage_gap_B_W ~ is_low * time, data = main_df[which(main_df$categories %in% c("low", "zero")),])
+# didreg_A_W <- lm(wage_gap_A_W ~ is_low * time, data = main_df[which(main_df$categories %in% c("low", "zero")),])
+
+didreg_B_W <- lm(wage_gap_B_W ~ trt * time, data = main_df)
+didreg_A_W <- lm(wage_gap_A_W ~ trt * time, data = main_df)
 summary(didreg_A_W)
+summary(didreg_B_W)
 summary(didreg_B_W)$coefficients[nrow(summary(didreg_B_W)$coefficients), "Pr(>|t|)"]
 summary(didreg_A_W)$coefficients[nrow(summary(didreg_A_W)$coefficients), "Pr(>|t|)"]
 

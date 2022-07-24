@@ -3,24 +3,25 @@ setwd("D:/github/wagegap22")
 library(wagegap22package)
 library(Hmisc)
 library(tidyr)
+library(dplyr)
+
+# !12-16
+# 11-16, 10-15, 16-19
+# 16-20, 10-16
+# set time
+before <- 2010
+after <- 2016
 
 #read data
 load("data/raw_data.RData")
-
-# 11-12, 12-16, 11-16, 16-19
-# 10-15, 16-19
-# 16-20, 10-16
-# set time
-before <- 2011
-after <- 2016
 
 # subset
 bf_median_earning <- median_earning_county[which(median_earning_county$year == before),]
 af_median_earning <- median_earning_county[which(median_earning_county$year == after),]
 median_earning_county <- merge(bf_median_earning, af_median_earning, by = "fips")
 median_earning_county[median_earning_county == -666666666] <- NA
-# median_earning_county[median_earning_county == 2499] <- NA
-# median_earning_county[median_earning_county == 250001] <- NA
+median_earning_county[median_earning_county == 2499] <- NA
+median_earning_county[median_earning_county == 250001] <- NA
 median_earning_county <- na.omit(median_earning_county)
 bf_median_earning <- median_earning_county[c("fips", "year.x", "B20017A_001E.x", "B20017B_001E.x", "B20017D_001E.x")]
 af_median_earning <- median_earning_county[c("fips", "year.y", "B20017A_001E.y", "B20017B_001E.y", "B20017D_001E.y")]
@@ -46,8 +47,9 @@ minwage_state_year <- merge(minwage_state_year_before, minwage_state_year_after,
 minwage_state_year <- minwage_state_year[,!(names(minwage_state_year) %in% c("year.x", "year.y"))]
 minwage_state_year$dif <- round(minwage_state_year$`after.State.Minimum.Wage` - minwage_state_year$`before.State.Minimum.Wage`, 2)
 minwage_state_year$trt <- !(minwage_state_year$dif == 0)
-minwage_state_year$fuzzy_trt <- minwage_state_year$dif / max(minwage_state_year$dif)
-# minwage_state_year <- onehotencoding(minwage_state_year, "dif")
+# minwage_state_year$fuzzy_trt <- minwage_state_year$dif / max(minwage_state_year$dif)
+minwage_state_year$categories <- cut(minwage_state_year$dif, breaks = c(-1, -0.001, 0, 1, 2, Inf), labels = c("low", "zero", "low", "medium", "high"))
+minwage_state_year <- onehotencoding(minwage_state_year, "categories")
 
 # age
 age_pop_county$ID <- paste0(age_pop_county$year, age_pop_county$fips)
